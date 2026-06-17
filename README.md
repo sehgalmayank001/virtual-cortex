@@ -100,4 +100,4 @@ Issues and PRs welcome — especially new skills. A few that are deliberately *n
 
 ---
 
-Built by [Mayank Sehgal](https://everai.ai). I write about software engineering craft at [Agnostic Logic](https://agnosticlogic.substack.com). If Virtual Cortex saved you an afternoon and you'd like help wiring it into your own workflow, [reach out](mailto:sehgalmayank001@gmail.com).
+Built by [Mayank Sehgal](https://www.linkedin.com/in/mayank-sehgal-9b320a92/). I write about software engineering craft at [Agnostic Logic](https://agnosticlogic.substack.com). If Virtual Cortex saved you an afternoon and you'd like help wiring it into your own workflow, [reach out](mailto:sehgalmayank001@gmail.com).
