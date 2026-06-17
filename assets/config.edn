@@ -1,0 +1,22 @@
+;; Slash commands for the Logseq Knowledge System bundle.
+;;
+;; Paste the :commands block below into your graph's logseq/config.edn,
+;; replacing the existing (likely empty) :commands key.
+;;
+;; Restart Logseq after saving — :commands only loads on startup.
+
+:commands
+[
+ ;; Property shortcuts.
+ ["attendees" "attendees:: "]
+ ["type"      "type:: "]
+ ["tags"      "tags:: "]
+ ["status"    "status:: "]
+ ["impact"    "impact:: "]
+ ["evidence"  "evidence:: "]
+ ["severity"  "severity:: "]
+ ["why"       "why:: "]
+ ["context"   "context:: "]
+ ["role"      "role:: "]
+ ["author"    "author:: "]
+]
