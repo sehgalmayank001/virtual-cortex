@@ -45,7 +45,7 @@ The structure handles it cleanly:
 - New job becomes another top-level hub (`widget-co/`)
 - Cross-cutting tags (`brag`, `decisions`, `incidents`) keep working — they're not job-specific
 
-No reorganisation needed. The 3-tier model is job-agnostic.
+No reorganisation needed. The model is job-agnostic.
 
 ## What if my graph gets huge?
 
@@ -59,7 +59,7 @@ What to watch for:
 
 ## What if I hate one of the powertags?
 
-Delete it. From `[[templates]]` and from your hub list. The 4 core invariants (3 tiers, 3 levels, lowercase namespaces, hub query syntax) are what matter — the specific powertag list is yours to curate.
+Delete it. From `[[templates]]` and from your hub list. The core invariants (the content + tags + properties model, 3 namespace levels, lowercase-hyphenated names, and the canonical write convention) are what matter — the specific powertag list is yours to curate.
 
 ## Where's the support if I get stuck?
 

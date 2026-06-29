@@ -145,6 +145,11 @@ Setup complete:
   New content: run /template <type> for structured notes, or type #tag inline.
   Hub queries include both old and new tags.
 
+  One-time re-index: pages and tag stubs written through the API don't always
+  register their references in Logseq's live index until you re-index. Open the
+  graph menu (top-right ⋯ → "Re-index") once now so the new hubs, renamed tags,
+  and stub properties resolve. Only needed after a bulk write like this.
+
   Next: restart Logseq to load the property shortcut commands.
   Then try: /template meeting in today's journal.
 ```

@@ -79,22 +79,23 @@ The candidates are the user's own journal phrasing, surfaced verbatim — don't 
 
 For each confirmed candidate, append a block to today's journal (NOT to the original day).
 
-**CRITICAL formatting:** put the `[[brag]]` reference INLINE on the title line. Do NOT use a `tags:: brag` property line — the mcp-logseq parser breaks it (see logseq-note skill for the full explanation). Use inline `[[reference]]` syntax instead.
+**Formatting:** write the brag with same-block properties matching the `brag` template — a `tags::` line plus `what-i-did::`, `impact::`, `evidence::`, all un-dashed directly under the title so they attach to the parent block.
 
 Block format:
 
 ```markdown
-- [[brag]] {one-line title} — from [[{original journal date}]]
-  - what i did: {original block content, verbatim from the user's journal}
-  - impact: 
-  - evidence: 
+- {one-line title}
+  tags:: brag
+  what-i-did:: {original block content, verbatim from the user's journal}
+  impact:: 
+  evidence:: [[{original journal date}]]
 ```
 
 Notes:
-- `[[brag]]` on the title makes the block surface on the brag hub via backlinks
-- `from [[{date}]]` links back to the original journal day for context
-- `impact:` and `evidence:` are plain bullets (no `::` syntax). The user fills these in later in Logseq if they want queryable properties
-- `what i did:` content is the verbatim phrasing the user originally wrote — don't rewrite it
+- `tags:: brag` surfaces the block on the brag hub (add the work hub too if the win is work-specific, e.g. `tags:: brag, <work-hub>`)
+- `evidence::` links back to the original journal day for context — the user can add PR links or metrics later
+- `impact::` is left blank — numerical impact is the user's to fill in
+- `what-i-did::` is the verbatim phrasing the user originally wrote — don't rewrite it
 
 ## Worked example
 

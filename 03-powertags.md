@@ -1,15 +1,17 @@
 # Powertags — the 8 note types
 
-A **powertag** is a note type that comes pre-built. Instead of remembering how to structure a meeting note or a decision log, you invoke the powertag and get the whole skeleton.
+A **powertag** is a note type that comes pre-built. Instead of remembering how to structure a meeting note or a decision log, you invoke the powertag and get the whole skeleton — already carrying the right tags and properties.
 
-Each powertag bundles two things:
+It's the three moving parts from [02-mental-model.md](02-mental-model.md) packaged under one name:
 
-- **Structure** — a template (`/template meeting`) inserts the full field tree, with the tag already baked in
-- **Collect** — a hub page (`[[meetings]]`) auto-lists every note carrying that tag
+- **Structure** — a template (`/template meeting`) inserts the full field tree, with the **tag** baked in (`tags:: meetings`, for grouping) and the **facet properties** in place (`type::`, `status::`, for slicing)
+- **Collect** — a saved view (the `[[meetings]]` hub) surfaces every note carrying that tag, and slices it by property into facets like *1:1s* and *Interviews*
 
-That's the whole idea: **template + hub, packaged under one name** so the structure is one keystroke away. The template carries the tag, so you never insert it separately.
+That's the whole idea: **template + saved view, one keystroke away.** The template carries the tag and properties, so you never insert them separately — and because the skills write the same shape through the API, AI capture lands in the same facets as manual capture.
 
-**Powertags are note types, not entities.** People and companies aren't powertags — you *reference* them (`attendees:: [[people/bob]]`), you don't stamp a note as "a person". They get hubs via namespace and backlinks instead. See [02-mental-model.md](02-mental-model.md) for that distinction.
+**Properties are what make the facets work.** Tagging a note `meetings` gets it into *All meetings*; only `type:: 1on1` gets it into the *1:1s* facet. If a note skips the property, it still shows in the bucket but not the slice. Keep facet values bare (`type:: 1on1`); each hub lists its allowed values.
+
+**Powertags are note types, not entities.** People and companies aren't powertags — you *reference* them (`attendees:: [[people/bob]]`), you don't stamp a note as "a person". They aggregate via namespace and backlinks instead. See [02-mental-model.md](02-mental-model.md) for that distinction.
 
 ---
 

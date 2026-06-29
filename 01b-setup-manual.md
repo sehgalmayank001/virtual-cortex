@@ -210,4 +210,4 @@ Apply this to tag stubs that have no content, only the hub queries. Skip this fo
 
 ## Next: read [02-mental-model.md](02-mental-model.md) for the *why*
 
-The setup works without understanding the model. But once you read about the 3 tiers, the rest of the bundle makes sense and you can extend it without breaking it.
+The setup works without understanding the model. But once you read about how content, tags, and properties fit together, the rest of the bundle makes sense and you can extend it without breaking it.

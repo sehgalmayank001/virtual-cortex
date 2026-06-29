@@ -1,147 +1,125 @@
-# Mental model — the 3 tiers
+# Mental model — content, tags, and properties
 
-Every page in your graph falls into one of three tiers. If you remember nothing else from this bundle, remember this:
+If you remember nothing else from this bundle, remember this: **you write content, you group it with tags, and you slice it with properties.** Everything else — hubs, queries, namespaces — is convenience built on those three things.
 
-## Tier 1: Hub pages
+There are no special kinds of page to learn. In Logseq, everything you reference is a page; the system is just a *schema* — a few naming and tagging conventions — laid over that flat space.
 
-**What they are:** Aggregator pages with an icon and a live query.
+## The three moving parts
 
-**Examples:** `meetings`, `python`, `react`, `people`, `learning`, `acme` (your work)
+### 1. Content — what you actually write
 
-**What they do:** Auto-list everything tagged with their name (or namespaced under them) via `{{query [[name]]}}`.
+A meeting note. A decision log. A book note. A page about `python/celery`. These hold your knowledge; everything else exists to make them findable.
 
-**Why they matter:** You never need to remember where you put something. You go to the hub for the topic, and there it is.
+Most content lives as **blocks in the daily journal** (low friction, captured as it happens). Some lives on its **own page** when it's a reusable doc you'll link to from many places. Both are just content.
 
-**Hub page template:**
+### 2. Tags — grouping
 
-```
-icon:: 🎨
+A tag answers *"what bucket is this in?"* You tag a meeting note with `meetings`; you tag a work note with `acme`.
 
-## Sub-topics (if you use namespaces)
-{{query (and (namespace [[hub-name]]) (not (page [[hub-name]])))}}
+The mechanics matter and they're simpler than they look:
 
-## Tagged pages
-{{query (and [[hub-name]] (not (page [[hub-name]])))}}
-```
+- Referencing a name — `[[meetings]]`, `#meetings`, or `tags:: meetings` — makes Logseq create a page for that name if it doesn't exist.
+- That page's **Linked References** section then lists **every block that references it, automatically**. No query required.
 
-A hub is the dashboard for a topic. Click `meetings`, see every meeting you've ever noted. Click `python`, see every python-related page.
+So a tag buys you grouping for free: tag 30 things with `meetings`, open the `meetings` page, and Logseq already shows all 30 under Linked References. **Backlinks are the index.** You never hand-maintain a list.
 
-## Tier 2: Tag stubs
+A note can carry as many tags as you like — `tags:: meetings, decisions, acme` puts one block in three buckets at once. Nothing is lost by tagging it "wrong"; tag it for every bucket it belongs to.
 
-**What they are:** Empty pages used purely as tags.
+### 3. Properties — slicing
 
-**Examples:** `system`, `gold-mine`, individual property name pages like `attendees`, `status`
+This is the real engine, and the part most note systems miss.
 
-**What they do:** Nothing — they exist only because Logseq creates a page every time you reference `[[name]]` or write `tags:: name`. They have no content.
+A tag only gives you the whole bucket: *all* meetings. A **property** lets you carve that bucket into the views you actually want:
 
-**Why they matter:** They make tags queryable and clickable. Their auto-creation is a Logseq quirk, not something you control.
+- `type:: 1on1` → "just my 1:1s," not every meeting
+- `type:: interview` → "just interviews"
+- `status:: open` → "incidents still on fire," not the resolved ones
+- `status:: reading` → "books I'm in the middle of"
+- `attendees:: [[people/John]]` → "meetings with John"
 
-**Tag stub template (apply to keep the graph view clean):**
+Tags can't do this on their own. "All my 1:1s with John" is a *tag* (`meetings`) sliced by *two properties* (`type:: 1on1` and `attendees:: [[people/John]]`). Backlinks alone would also surface a group meeting John merely attended — the property is what makes the view precise.
 
-```
-tags:: system
-exclude-from-graph-view:: true
-```
+**Properties are the spine of the system.** Tags get you to the bucket; properties get you to the answer.
 
-You'll have dozens of these. They're invisible noise — hide them.
+That's the entire data model — content, grouped by tags, sliced by properties. Everything from here on is just convenience built on top of it.
 
-## Tier 3: Content pages
+## Which queries are worth saving
 
-**What they are:** Real notes. The reason you opened Logseq.
+A plain tag page already aggregates everything tagged with it through Linked References, so an "all X" query just re-renders what Logseq shows for free. Don't bother saving those. Only two kinds of query add something backlinks can't:
 
-**Examples:** A 1:1 with Bob. A book note on *Designing Data-Intensive Applications*. A decision log about which payment processor to use.
+- **Property facets** — slice a tag by a property. `(property type "1on1")` gives you *just 1:1s*; `(property status open)` gives you *just the open incidents*. This is the payoff of properties — Linked References can't filter by `type::` or `status::`. The facet only works if your content carries the property (see the write convention below): a meeting with no `type::` shows in backlinks but never under *1:1s*.
+- **Namespace lists** — `(namespace [[people]])` lists the child pages under a namespace, which is a different thing from backlinks.
 
-**What they do:** Hold your actual knowledge.
-
-**Why they matter:** Everything else exists to make these findable and connectable.
-
-**How they show up on hubs:** They include `tags:: <hub-name>` (or live in a namespace like `acme/audit`). The hub's query picks them up automatically.
-
----
-
-## Why this model works
-
-**Separation of concerns:**
-
-- Hubs are *views*. They surface content but don't contain it.
-- Stubs are *tags*. They categorize but don't carry information.
-- Content pages are *data*. They hold what you actually wrote.
-
-You can't accidentally lose a note by tagging it wrong, because **the same note can be tagged for multiple hubs**. A meeting with Bob that decided which payment processor to use? Tag it `meetings, decisions, people/Bob`. It shows on all three hubs.
-
-**No central index needed:**
-
-Wikis and docs systems often need a hand-curated index page. This model doesn't — queries are the index. They self-update as you add content.
-
-**Namespaces add hierarchy when you need it:**
-
-If you have lots of python pages (`python/celery`, `python/testing`, `python/packaging`), you can navigate them as a tree via Logseq's namespace UI. But you can also reach any of them via `{{query [[python]]}}`. Two access paths, zero extra work.
-
----
-
-## What goes in which tier — decision tree
+A tag page you've curated this way — an icon, plus whichever facet or namespace queries are worth keeping — is what the rest of this bundle calls a **hub**. That's all "hub" means: a tag page with saved views on it, not a separate kind of object. Add a query only for a facet, a namespace list, a synonym merge (`(or [[brag]] [[shipped]])`), or a curated description — never for plain aggregation.
 
 ```
-Are you writing something that will be referenced 2+ times?
-├── Yes → Content page or block in journal
-│   └── Tag it with relevant hub(s)
-│
-└── No (it's a category/label) → Tag stub
-    └── Mark it system + exclude from graph view
+icon:: 📅
+- ## 1:1s
+	- {{query (and [[meetings]] (property type "1on1"))}}
+- ## Interviews
+	- {{query (and [[meetings]] (property type interview))}}
 ```
 
+> Quoting quirk: a property value that starts with a digit must be quoted in the query — `(property type "1on1")`, not `(property type 1on1)`, which Logseq fails to parse. Alphabetic values like `interview` don't need quotes. Each faceted hub lists its allowed values in a `*-values::` page property so they're discoverable.
+
+## The canonical write convention
+
+There is **one** way notes get written so they tag and slice correctly. The `/template` command does it for you in the app; the AI skills do the same through the API.
+
+- **Tags go on a `tags::` line directly under the title bullet** (un-dashed), so they attach to that block:
+  ```
+  - Squad standup
+    type:: 1on1
+    attendees:: [[people/bob]]
+    tags:: meetings, acme
+    - ## Notes
+      - ...
+  ```
+- **Scalar property values are bare** — `type:: 1on1`, `status:: open`. Never bracket them.
+- **Reference properties hold page links** — `attendees:: [[people/bob]]`, `company:: [[acme]]`.
+- **Don't put `tags::`/`type::` on a dashed child bullet** (`- tags:: …`). The dash makes it a separate block and the title stays untagged.
+- **If a freshly written note doesn't show on its hub, re-index once** (Logseq graph menu → Re-index). File and API writes can lag Logseq's live index; a re-index resolves them. You only need this after a bulk write.
+
+That's the whole convention. Manual capture and AI capture produce the same block shape, so everything queries the same way.
+
+## Namespaces — hierarchy when you want it
+
+Namespaces (`python/celery`, `acme/audit`) give you a tree without extra work. `python/celery` is reachable through Logseq's namespace UI *and* via `{{query [[python]]}}` — two access paths, zero duplication.
+
+**Maximum 3 levels deep.** `acme/audit` is fine; `acme/audit/2026` is fine; `acme/audit/2026/q1` is too deep. Past 3 levels, names get long, renames cascade, and search beats navigation. If you're tempted to go deeper, flatten by combining: `acme/audit-2026-q1`.
+
+## Decide: tag or property?
+
 ```
-Are you organizing a topic with 3+ related notes?
-├── Yes → Create a hub page
-│   └── Add icon + queries
-│
-└── No → Skip the hub. Just use the tag.
+Writing something you'll want to find again?
+└── Yes → content (journal block, or its own page if it's a reusable doc)
+          └── add tags:: for every bucket it belongs to
+
+Want to see a *slice* of a tag (just 1:1s, just open incidents)?
+└── Yes → that distinction is a property (type::, status::), not a new tag
+
+Reaching for the same view over and over?
+└── Save it as a query on the tag page (that's all a "hub" is).
+    Otherwise don't — Linked References already aggregate the tag.
 ```
 
----
+Rule of thumb: **everything is a tag or a property.** Saving a query on a tag page is optional, and only worth it when the query does something backlinks can't — a property facet, a synonym merge, or a curated landing page.
 
-## The 3-level namespace rule
+## People and companies are entities, not note types
 
-**Maximum 3 levels deep.** `acme/audit` is fine. `acme/audit/2026` is fine. `acme/audit/2026/q1` is too deep.
+You don't write a note "of type person." You create `people/bob` once and *reference* it (`attendees:: [[people/bob]]`). The person page then aggregates everything about them through backlinks — every meeting, every 1:1 — with no "Bob series" page to maintain. Link people to where they belong with a `company::` property (`company:: [[acme]]` or `company:: [[companies/stripe]]`) so the connection is queryable from both sides.
 
-Why? Beyond 3 levels, navigation becomes worse than search. Names get long. Renames cascade. Mental load goes up.
+Companies work the same way under the `companies/` namespace for external vendors, customers, and partners.
 
-If you're tempted to go 4 levels, flatten by combining: `acme/audit-2026-q1` (2 levels). Less elegant, but easier to maintain.
+## Why this holds up
 
----
+- **Nothing to file.** You capture once and tag; queries and backlinks handle visibility. No moving notes between folders.
+- **No central index to maintain.** Backlinks are the index; they self-update.
+- **Precise recall.** Properties let you ask exact questions ("open sev1 incidents this quarter") instead of scrolling a bucket.
+- **It bends to you.** Don't like a hub? Delete it — the tag still works. Don't need a facet? Drop the property.
 
-## What's *not* a hub
-
-These look like hubs but aren't — they're just topic tags. The difference: hubs have content and queries; topic tags are passive markers.
-
-
-| Not a hub                             | Why                                                  |
-| ------------------------------------- | ---------------------------------------------------- |
-| `gold-mine`                           | Just a quality marker — "this resource is excellent" |
-| `system`                              | Logseq metadata — "this page is infrastructure"      |
-| `reminder`                            | Just a flag for review later                         |
-| `acme` (if you only have a few notes) | Becomes a hub only if you'd benefit from a dashboard |
-
-
-The line between "topic tag" and "hub" is fuzzy. Rule of thumb: **make a hub only when you have 3+ notes you'd want to see together.**
-
----
-
-## Powertags — the note types that sit on top of the tiers
-
-The 3 tiers above describe *pages*. **Powertags** describe the *note types* that flow through them.
-
-A powertag is a note type that ships pre-built with two things:
-
-- a **template** that inserts the field structure *and* the tag in one go — `/template meeting`
-- a **hub** that auto-collects every one you write — `[[meetings]]`
-
-The bundle includes 8: `meeting`, `1on1`, `interview`, `brag`, `book-note`, `incident`, `decision`, `strikedoc`. They're the things you create over and over — events and artifacts.
-
-There's nothing new here: a powertag note is just a **Tier 3 content block** carrying `tags:: <name>`, which lands it on that name's **Tier 1 hub**. "Powertag" is simply the three tiers working together, packaged under one name so you never rebuild the structure by hand.
-
-**People and companies are not powertags.** They're *entities* — stable things your notes point at. You don't write a note "of type person"; you create a `people/bob` page once and reference it (`attendees:: [[people/bob]]`). Entities get hubs (via namespace and backlinks) but no template and no `tags::` of their own.
+The only invariants worth protecting: max 3 namespace levels, lowercase-hyphenated names, the canonical write convention above, and faceted hubs listing their allowed property values.
 
 ## Next: read [03-powertags.md](03-powertags.md) for the note types
 
-Powertags are *for things you make many of* (meetings, brags, decisions, etc.). The bundle ships with 8, each with a template and a hub. The next file walks through them with examples.
+The bundle ships 8 ready-made note types (meetings, brags, decisions, incidents…), each a template that stamps the right tags and properties in one keystroke. The next file walks through them with examples.

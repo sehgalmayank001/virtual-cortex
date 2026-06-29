@@ -61,33 +61,20 @@ If the content is a debugging analysis, customer case, or "Not a bug" explanatio
 
 > "Detected a system rule here. Saving as a journal block with structured headings — Rule first, Debugging second, Cases last. Tagging with `brag, <work-hub>, <work-hub>/token-bonus` so it shows on the token-bonus topic page. (No `decisions` — nothing was decided, it's a diagnosis.) Sound good?"
 
-**CRITICAL formatting — write tag references INLINE on the title line, not as a `tags::` property.**
+**Formatting — write tags as a same-block property on the title block.**
 
-Why: when this skill writes to Logseq via the mcp-logseq MCP server, that server's parser does NOT recognize `tags::` lines under a bullet as parent properties. It creates them as separate empty child blocks with the property attached to those phantom children. Result: the title block is untagged, the hub displays an empty bullet as the surfaced reference.
+Put the note's tags on a `tags::` line directly under the title bullet (un-dashed), the same shape `/template` produces. The tags attach to the parent (title) block, so the note surfaces on every hub you list.
 
-The workaround: put hub references **inline on the title line**, separated by `—`. Logseq treats inline `[[ref]]` exactly like `tags:: ref` for backlinks and queries.
-
-✅ **CORRECT — references inline on the title:**
-
-```
-- <title> — [[decisions]] [[brag]] [[<work-hub>]] [[<work-hub>/<topic>]]
-  - ## Rule
-    - ...
-```
-
-The title block contains the references. Queries on any hub find this block. Hub displays the full title with references. No phantom blocks.
-
-❌ **WRONG — tags:: as a property line under title:**
+✅ **CORRECT — `tags::` as a same-block property:**
 
 ```
 - <title>
   tags:: decisions, brag, <work-hub>, <work-hub>/<topic>
   - ## Rule
+    - ...
 ```
 
-The mcp-logseq parser breaks it — see the MCP parser source (`_parse_list_item` in `parser.py` has no `LOGSEQ_PROPERTY_PATTERN` handling for nested content).
-
-❌ **WRONG — `tags::` as a bulleted child:**
+❌ **WRONG — `tags::` on a dashed child bullet:**
 
 ```
 - <title>
@@ -95,19 +82,19 @@ The mcp-logseq parser breaks it — see the MCP parser source (`_parse_list_item
   - ## Rule
 ```
 
-The dash makes `tags::` a separate child block. Same parent-untagged problem.
+The dash makes `tags::` a separate child block, so the title stays untagged. Keep property lines un-dashed, right under the title.
 
 **Self-check before writing:**
 
-1. Title line ends with `— [[hub-1]] [[hub-2]] [[hub-3]]...`
-2. No `tags::` property line anywhere in the block
-3. References use `[[double-bracket]]` syntax — works for hub names with `/` like `<work-hub>/<topic>`
-4. Mentally render: does the title block ITSELF contain the references? If yes, correct. If they're on a separate line, fix.
+1. `tags::` is an un-dashed line immediately under the title bullet
+2. Scalar values (`type::`, `status::`) are written bare — never bracketed
+3. If the note doesn't appear on its hub after writing, re-index the graph once (Logseq graph menu → Re-index) — file/API writes can lag Logseq's live index
 
 **Worked example of the block structure** (everything stays in ONE block in today's journal):
 
 ```markdown
-- <ticket-A> + <ticket-B> not bugs — <topic> — [[brag]] [[<work-hub>]] [[<work-hub>/<topic>]]
+- <ticket-A> + <ticket-B> not bugs — <topic>
+  tags:: brag, <work-hub>, <work-hub>/<topic>
   - ## Rule
     - <condition that must hold> for <behavior> to happen, in plain words
     - <what the system keys off> — name the concept, not the class
@@ -218,22 +205,20 @@ A note can have multiple tags. E.g. a Python-related decision at the user's job 
 
 ### 5. Write the block
 
-**Journal block format** (use inline references, not `tags::` — see "CRITICAL formatting" section above):
+**Journal block format** (tags as a same-block property — see "Formatting" section above):
 
 ```markdown
-- {one-line title} — [[tag1]] [[tag2]] [[tag3]]
+- {one-line title}
+  tags:: tag1, tag2, tag3
   - {key points in plain language}
   - {one more point}
 ```
 
-**Own page format:**
+**Own page format** (page properties as the first block, then content):
 
-```yaml
----
-tags: {comma-separated tags}
----
-```
 ```markdown
+tags:: {comma-separated tags}
+
 ## Context
 {why this exists}
 
@@ -276,7 +261,7 @@ Suggest:
 
 On confirmation, write a block with:
 - A clear one-line title naming the tickets and topic
-- Inline `[[references]]` on the title line for all detected tags
+- A `tags::` same-block property under the title for all detected tags
 - Bullets in plain language: what the system actually does + why each ticket isn't a defect
 - A final "Action" bullet if next step is needed
 

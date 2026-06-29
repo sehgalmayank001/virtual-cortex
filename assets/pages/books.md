@@ -1,4 +1,5 @@
 icon:: 📖
+status-values:: to-read, reading, read
 
 - ## All books
 	- {{query (and [[books]] (not (page [[books]])))}}

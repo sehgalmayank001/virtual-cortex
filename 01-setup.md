@@ -28,4 +28,4 @@ You can always start manual and add the AI skills later, the manual setup is ful
 
 ➡️ **[Manual setup (~15 min)](01b-setup-manual.md)**
 
-Once setup is done, read [02-mental-model.md](02-mental-model.md) for the *why* behind the 3 tier system.
+Once setup is done, read [02-mental-model.md](02-mental-model.md) for the *why* behind the content + tags + properties model.

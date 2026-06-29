@@ -209,10 +209,15 @@ Virtual Cortex setup complete:
 Your existing tags (#standup, #retro, etc.) are included in the hub queries.
 New content: run /template <type> for structured notes, or type #tag inline.
 
+One-time re-index: pages created through the API don't always register their
+references in Logseq's live index until you re-index. Open the graph menu
+(top-right ⋯ → "Re-index") once now so the new hubs and any people/project
+references resolve. You only need to do this after a bulk write like setup.
+
 To test: restart Logseq, then type /template meeting in today's journal.
 
 Next steps:
-  - Read 02-mental-model.md to understand the 3-tier system
+  - Read 02-mental-model.md to understand the content + tags + properties model
   - Read 03-powertags.md for worked examples of each template
   - Try /brag-finder to surface wins you've already written but didn't tag
 ```
