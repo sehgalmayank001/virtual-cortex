@@ -9,7 +9,7 @@ Pulls meetings from the user's transcript/summary tool and writes them to the co
 
 **Two things the properties do:**
 
-- **`tags:: [[meetings]]`** groups the note — it's what lands under the **All meetings** view (and `[[<work-hub>]]` puts it on the work hub too).
+- **`tags:: meetings`** groups the note — it's what lands under the **All meetings** view (and `<work-hub>` puts it on the work hub too).
 - **`type::`** facets it — the **1:1s** and **Interviews** views query `(property type "1on1")` / `(property type interview)`, so a meeting only appears under a facet if it carries the matching `type::`.
 
 **Values:** `type::`/`status::` are scalar — write them bare (`type:: 1on1`). `tags::`/`attendees::` hold page references. If a freshly written note doesn't show on its hub, re-index the graph once (Logseq graph menu → Re-index) — API/file writes can lag Logseq's live index.
@@ -139,7 +139,7 @@ Examples: `Jun 12th, 2026`, `Jan 1st, 2026`, `Mar 23rd, 2025`.
 
 ### 4. Idempotency check
 
-Before writing, check the journal page for an existing meeting block with the same title. If a meeting block with that title (carrying `tags:: [[meetings]]`) already exists on that journal date, ask the user whether to skip or overwrite.
+Before writing, check the journal page for an existing meeting block with the same title. If a meeting block with that title (carrying `tags:: meetings`) already exists on that journal date, ask the user whether to skip or overwrite.
 
 ### 4a. Scan summary for durable rules — REQUIRED
 
@@ -164,7 +164,7 @@ When strong rule signals are detected, **add a `## Key insights` section as the 
 
 For each meeting, append one block to the journal page (mode=append). When syncing multiple meetings same day, **order chronologically ascending** (earliest first) so the journal reads top-to-bottom through the day. **Add an empty block between meetings** as a visual separator.
 
-**Formatting:** write the tags and metadata as **same-block properties** — un-dashed `key:: value` lines directly under the title bullet — so they attach to the parent (title) block. Do not put them on dashed child bullets — that makes them separate blocks. In `tags::` and `attendees::`, every value is a `[[bracketed]]` reference; scalar values like `type::` stay bare.
+**Formatting:** write the tags and metadata as **same-block properties** — un-dashed `key:: value` lines directly under the title bullet — so they attach to the parent (title) block. Do not put them on dashed child bullets — that makes them separate blocks. Tag values in `tags::` are bare (`meetings`); `attendees::` values are `[[bracketed]]` page references. Scalar values like `type::` stay bare.
 
 Block format (with rule signals detected):
 
@@ -172,7 +172,7 @@ Block format (with rule signals detected):
 - {Title} — {HH:MM}
   type:: 1on1
   attendees:: [[people/x]], [[people/y]]
-  tags:: [[meetings]], [[<work-hub>]], [[<work-hub>/<topic-1>]], [[<work-hub>/<topic-2>]]
+  tags:: meetings, <work-hub>, <work-hub>/<topic-1>, <work-hub>/<topic-2>
   - ## Key insights
     - <rule 1, terse, like a note not docs>
     - <rule 2>
@@ -192,7 +192,7 @@ Block format (no rule signals, plain meeting):
 ```markdown
 - {Title} — {HH:MM}
   attendees:: [[people/x]], [[people/y]]
-  tags:: [[meetings]], [[<work-hub>]]
+  tags:: meetings, <work-hub>
   - ## Summary
     - {summary content, preserved}
   - ## Action items
@@ -235,7 +235,7 @@ Synced N meetings to [[Jun 12th, 2026]]:
 - **No source attribution.** No "synced from X" lines, no tool-specific ID properties. Just the meeting content.
 - **Strip formatting artifacts.** Tools often add escape characters (e.g. `\~30 minutes` → `~30 minutes`). Clean them.
 - **TODO discipline.** Only the user's own action items become TODOs. Everyone else's work stays as plain text bullets.
-- **Tag and facet via same-block properties.** `tags:: [[meetings]]` (+ `[[<work-hub>]]`/topics, all bracketed) groups; `type:: 1on1`/`interview` (bare) facets. Write them as un-dashed lines directly under the title so they attach to the parent block. Generic meetings need no `type::`.
+- **Tag and facet via same-block properties.** `tags:: meetings` (+ `<work-hub>`/topics, all bare) groups; `type:: 1on1`/`interview` (bare) facets. Write them as un-dashed lines directly under the title so they attach to the parent block. Generic meetings need no `type::`.
 
 ## Worked example
 
@@ -246,7 +246,7 @@ Synced N meetings to [[Jun 12th, 2026]]:
 ```markdown
 - Team Standup — 13:30
   attendees:: [[people/bob]], [[people/charlie]]
-  tags:: [[meetings]], [[<work-hub>]], [[<work-hub>/<topic>]]
+  tags:: meetings, <work-hub>, <work-hub>/<topic>
   - ## Key insights
     - <rule extracted from discussion, terse, note voice>
     - <another rule if surfaced>
@@ -284,6 +284,20 @@ The `Key insights` section surfaces durable rules at the TOP of the meeting bloc
 **TODO discipline:** Bob-only items are plain bullets; Alice-owned (or shared) items are `TODO`. The empty `-` between meeting blocks gives visual separation in Logseq.
 
 **People stubs created:** `people/bob`, `people/charlie` (created as needed; existing pages reused).
+
+## Voice
+
+No tool-call narration. No decorative tables or emoji. No long raw error-log dumps unless user asks. Standard tech acronyms OK (DB/API/MCP); never invent new abbreviations.
+
+Abbreviate prose words (auth/config/req/res/fn/impl) — prose words only, never real code symbols or function names. Strip conjunctions; use arrows for causality (X → Y). One word when one word enough. Code symbols, function names, API names, error strings: never abbreviate.
+
+No filler. No hedging. No "you", "your", "we". Keep sentences intact. Professional but tight.
+
+**Example**
+
+❌ "Of course! Let me help you sync your meetings. First I'll detect which meeting tool you use by checking your MCP servers, then I'll pull the most recent meeting."
+
+✅ "Synced 3 meetings to [[Jun 12th, 2026]]: Standup (13:30) — 2 attendees, Customer sync (15:00) — 4 attendees, Sprint retro (16:00) — 5 attendees. 2 people stubs created."
 
 ## Don't
 

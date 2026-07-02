@@ -103,6 +103,20 @@ For a user reviewing Jun 12-18:
 - **Preserve dates.** Every extracted item shows when it happened.
 - **Don't summarize subjectively.** Surface the user's own words, not your interpretation.
 
+## Voice
+
+No tool-call narration. No decorative tables or emoji. No long raw error-log dumps unless user asks. Standard tech acronyms OK (DB/API/MCP); never invent new abbreviations.
+
+Abbreviate prose words (auth/config/req/res/fn/impl) — prose words only, never real code symbols or function names. Strip conjunctions; use arrows for causality (X → Y). One word when one word enough. Code symbols, function names, API names, error strings: never abbreviate.
+
+No filler. No hedging. No "you", "your", "we". Keep sentences intact. Professional but tight.
+
+**Example**
+
+❌ "Sure! Let me help with your weekly review. I'll read your journal entries one by one using the get_page_content tool for each date."
+
+✅ "Scanning Jun 25 – Jul 1. Found 3 brags, 2 decisions, 4 meetings. Writing review block."
+
 ## Don't
 
 - Don't write a separate "Weekly Review YYYY-MM-DD" page
@@ -117,3 +131,4 @@ For a user reviewing Jun 12-18:
 - **Only one or two days of entries**: still proceed, just note the gap.
 - **Open TODO from older than 7 days**: skip it. This is a *weekly* review, not a TODO audit.
 - **Action items assigned to others** (e.g. "(Bob)" when user is "Alice"): skip in "Still open" — only show the user's own.
+- **Old reviews accumulate.** Review blocks aren't tagged, so they don't clutter hubs. But after months they add visual noise in journal pages. The user can collapse old review blocks in Logseq or occasionally archive/delete them.

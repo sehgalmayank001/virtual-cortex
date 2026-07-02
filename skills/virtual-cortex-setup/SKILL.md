@@ -21,7 +21,7 @@ The user must have:
 
 ## Bundled files
 
-This skill builds pages from ready-made files that ship **inside the bundle, in an `assets/` folder that sits next to the skills** — a sibling of this skill's own directory. After the standard install (`cp -r skills/* ~/.claude/skills/`) they live at `<your-skills-dir>/assets/` (e.g. `~/.claude/skills/assets/`).
+This skill builds pages from ready-made files that ship **inside the bundle, in an `assets/` folder that sits next to the skills** — a sibling of this skill's own directory. After the standard install (`cp -rL skills/* ~/.claude/skills/`) they live at `<your-skills-dir>/assets/` (e.g. `~/.claude/skills/assets/`).
 
 Whenever a step says `assets/pages/<hub>.md`, `assets/templates.md`, or `assets/config.edn`, read it from that bundled `assets/` folder. Never hand-write the content from memory, and never look inside the user's graph for it. If you cannot locate the folder, ask the user where they unpacked the bundle rather than improvising the file contents — improvising is how the hubs and templates silently drift from the shipped, correct versions.
 
@@ -190,7 +190,13 @@ Find the :commands line and replace it with:
  ["why"       "why:: "]
  ["context"   "context:: "]
  ["role"      "role:: "]
- ["author"    "author:: "]
+ ["author"     "author:: "]
+ ["candidate"  "candidate:: "]
+ ["about"      "about:: "]
+ ["chosen"     "chosen:: "]
+ ["options"    "options:: "]
+ ["doc"        "doc:: "]
+ ["verdict"    "verdict:: "]
 ]
 
 Save the file and restart Logseq.
@@ -229,7 +235,7 @@ Next steps:
 - **Don't overwrite existing pages.** If a hub already exists, skip it. If templates exist, append only what's missing.
 - **Don't touch config.edn.** Always tell the user what to paste manually.
 - **Don't create namespace sub-pages.** Only top-level hubs. Sub-topics emerge from usage.
-- **Don't assume all 8 powertags.** Ask which ones the user wants.
+- **Don't assume all powertags.** Ask which ones the user wants.
 
 ## Edge cases
 
@@ -238,6 +244,20 @@ Next steps:
 - **Templates page exists with some templates:** Show a diff of what's missing. Offer to append.
 - **MCP works but returns 0 pages:** Logseq graph might be empty or the wrong graph is open. Ask the user to check which graph is active.
 - **User wants to rename existing tags:** Defer to `/graph-init` which handles the rename flow. This skill focuses on scaffolding, not migration.
+
+## Voice
+
+No tool-call narration. No decorative tables or emoji. No long raw error-log dumps unless user asks. Standard tech acronyms OK (DB/API/MCP); never invent new abbreviations.
+
+Abbreviate prose words (auth/config/req/res/fn/impl) — prose words only, never real code symbols or function names. Strip conjunctions; use arrows for causality (X → Y). One word when one word enough. Code symbols, function names, API names, error strings: never abbreviate.
+
+No filler. No hedging. No "you", "your", "we". Keep sentences intact. Professional but tight.
+
+**Example**
+
+❌ "Great choice! I'm going to set up your Logseq graph now. Let me first verify your MCP connection and then scan your existing pages to see what's already there."
+
+✅ "Connected to graph (N pages). Creating brag, decisions, incidents hubs. Existing tags #standup → merged into meetings query. Confirm?"
 
 ## Don't
 

@@ -1,25 +1,22 @@
 #!/usr/bin/env bash
 #
-# Mirror the canonical assets/ into skills/assets/ so the AI setup skills
-# (virtual-cortex-setup, graph-init) ship with the same hub pages, templates,
-# and config as the manual route.
+# No-op. skills/assets is a symlink to assets/. The canonical files live in one
+# place. Run this if the symlink is missing (e.g. after a git checkout on a
+# filesystem that doesn't support symlinks).
 #
-# The bundle keeps two copies on purpose:
-#   - assets/         canonical, used by the manual setup (dropped into pages/)
-#   - skills/assets/  travels with `cp -r skills/*` so the skills are self-contained
-#
-# Run this whenever you change anything under assets/.
+# If you need to recreate: ln -s ../assets skills/assets
 
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if [ ! -d "assets" ]; then
-  echo "error: assets/ not found, run this from inside the bundle." >&2
+if [ ! -L "skills/assets" ] && [ ! -d "skills/assets" ]; then
+  ln -s ../assets skills/assets
+  echo "Created skills/assets -> ../assets"
+elif [ -L "skills/assets" ]; then
+  echo "skills/assets symlink OK"
+else
+  echo "skills/assets exists as a directory — it should be a symlink."
+  echo "Remove it and run: ln -s ../assets skills/assets"
   exit 1
 fi
-
-rm -rf "skills/assets"
-cp -R "assets" "skills/assets"
-
-echo "Synced assets/ -> skills/assets/"

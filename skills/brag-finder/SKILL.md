@@ -29,23 +29,26 @@ Use `mcp__mcp-logseq__get_page_content` per date. Skip dates with no journal.
 Scan every block for these signal phrases (case-insensitive):
 
 **High signal** (very likely a brag):
-- "shipped"
-- "deployed"
-- "fixed [bug|issue|...]"
-- "launched"
-- "delivered"
+- "shipped" / "we shipped" / "team shipped"
+- "deployed" / "we deployed" / "rolled out"
+- "fixed [bug|issue|...]" / "we fixed" / "squashed"
+- "launched" / "we launched"
+- "delivered" / "we delivered"
 - "merged" (especially with PR numbers)
-- "led" (e.g. "led the migration")
-- "mentored" / "onboarded"
-- "reduced [latency|cost|time]"
-- "saved [hours|days|$]"
+- "led" / "spearheaded" / "drove" / "chaired"
+- "mentored" / "onboarded" / "coached"
+- "reduced [latency|cost|time]" / "cut [latency|cost|time] by"
+- "saved [hours|days|$]" / "freed up"
+- "architected" / "designed the" / "built the"
 
 **Medium signal** (might be a brag, check context):
-- "decided to" (could be a decision worth bragging)
-- "presented"
-- "wrote [doc|RFC|design]"
-- "reviewed"
-- "debugged"
+- "decided to" / "chose" (could be a decision worth bragging)
+- "presented" / "demoed" / "walked through"
+- "wrote [doc|RFC|design]" / "authored"
+- "reviewed" / "audited"
+- "debugged" / "triaged" / "root-caused"
+- "unblocked" / "cleared the way for"
+- "closed [ticket|issue|project]" / "wrapped up"
 
 **Skip these** (not brags):
 - "tried to X but failed"
@@ -128,6 +131,20 @@ Done. 4 brags logged. Open [[brag]] hub to see them all.
 - **Link back to the original date** via `evidence::` so context isn't lost.
 - **Leave `impact::` blank.** Numerical impact is the user's to know.
 - **Don't bullshit.** If you don't find anything, say so. Don't invent wins.
+
+## Voice
+
+No tool-call narration. No decorative tables or emoji. No long raw error-log dumps unless user asks. Standard tech acronyms OK (DB/API/MCP); never invent new abbreviations.
+
+Abbreviate prose words (auth/config/req/res/fn/impl) — prose words only, never real code symbols or function names. Strip conjunctions; use arrows for causality (X → Y). One word when one word enough. Code symbols, function names, API names, error strings: never abbreviate.
+
+No filler. No hedging. No "you", "your", "we". Keep sentences intact. Professional but tight.
+
+**Example**
+
+❌ "Excellent question! I'd be happy to help you find brags you might have missed. Let me scan your journal entries for the last 30 days and pattern-match for win-like language."
+
+✅ "Scanning journal Jun 1–30. Found 4 candidates. Which should I log?"
 
 ## Don't
 

@@ -37,7 +37,7 @@ claude mcp add mcp-logseq \
 The bundle ships seven skills under `skills/`. Copy them into your agent's skills directory:
 
 ```bash
-cp -r skills/* ~/.claude/skills/
+cp -rL skills/* ~/.claude/skills/
 ```
 
 For Cursor or other tools, see [skills/README.md](skills/README.md) for the right directory. Restart your agent session so the skills load.

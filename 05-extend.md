@@ -59,11 +59,26 @@ icon:: 🏗️
 {{query (and [[arch-reviews]] (property verdict reject))}}
 ```
 
-### Step 3 — Test (30 sec)
+### Step 3 — Add slash commands for new properties (30 sec)
+
+If your template introduces new property keys (`doc::`, `verdict::`), add them to your graph's `logseq/config.edn` so you can type `/doc` and `/verdict` instead of typing `doc:: ` manually:
+
+```
+:commands
+[
+ ...
+ ["doc"     "doc:: "]
+ ["verdict" "verdict:: "]
+]
+```
+
+Restart Logseq after saving — `:commands` only loads on startup.
+
+### Step 4 — Test (30 sec)
 
 Go to today's journal. Type the review title, indent, then `/template arch-review`. Fill in. Verify it shows on the `arch-reviews` hub.
 
-Done. Total time: ~4 minutes.
+Done. Total time: ~5 minutes.
 
 ---
 

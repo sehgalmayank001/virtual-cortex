@@ -72,6 +72,17 @@ icon:: 🧱
       - 
     - ## Followups
       - TODO 
+- ## Learning note
+  - (what you learned, in one line)
+    template:: learning-note
+    source:: 
+    tags:: learning
+    - ## Key takeaway
+      - 
+    - ## Why it matters
+      - 
+    - ## Apply
+      - TODO 
 - ## Brag
   - (the win, in one line)
     template:: brag

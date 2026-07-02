@@ -16,7 +16,7 @@ Use `/virtual-cortex-setup` if you want the full guided run including the MCP co
 
 ## Bundled files
 
-This skill builds pages from ready-made files that ship **inside the bundle, in an `assets/` folder that sits next to the skills** — a sibling of this skill's own directory. After the standard install (`cp -r skills/* ~/.claude/skills/`) they live at `<your-skills-dir>/assets/` (e.g. `~/.claude/skills/assets/`).
+This skill builds pages from ready-made files that ship **inside the bundle, in an `assets/` folder that sits next to the skills** — a sibling of this skill's own directory. After the standard install (`cp -rL skills/* ~/.claude/skills/`) they live at `<your-skills-dir>/assets/` (e.g. `~/.claude/skills/assets/`).
 
 Whenever a step says `assets/pages/<hub>.md`, `assets/templates.md`, or `assets/config.edn`, read it from that bundled `assets/` folder. Never hand-write the content from memory, and never look inside the user's graph for it. If you cannot locate the folder, ask the user where they unpacked the bundle rather than improvising the file contents.
 
@@ -170,6 +170,20 @@ Setup complete:
 - **User's existing tags are close but not exact matches** (e.g. `post-mortem` vs `postmortem`): Surface these as "possible matches" and let the user decide.
 - **Multiple projects/companies detected:** Create a hub for each. Ask the user which is their current/primary one.
 
+## Voice
+
+No tool-call narration. No decorative tables or emoji. No long raw error-log dumps unless user asks. Standard tech acronyms OK (DB/API/MCP); never invent new abbreviations.
+
+Abbreviate prose words (auth/config/req/res/fn/impl) — prose words only, never real code symbols or function names. Strip conjunctions; use arrows for causality (X → Y). One word when one word enough. Code symbols, function names, API names, error strings: never abbreviate.
+
+No filler. No hedging. No "you", "your", "we". Keep sentences intact. Professional but tight.
+
+**Example**
+
+❌ "Great! Let me help you set up your graph. I'll scan through all your existing pages and find your tags so we can map them to the system."
+
+✅ "Scanned graph (N pages). Meeting-like tags: #standup, #retro. Brag-like: #shipped. Create 6 hubs, merge existing tags?"
+
 ## Don't
 
 - Don't create pages the user didn't agree to
@@ -177,4 +191,4 @@ Setup complete:
 - Don't create empty sub-namespace pages ("you'll need these later")
 - Don't modify journal entries
 - Don't add `exclude-from-graph-view` to pages the user actively uses
-- Don't assume the user wants all 8 powertags — ask which ones they actually use
+- Don't assume the user wants all powertags — ask which ones they actually use

@@ -99,6 +99,20 @@ Output:
 - **Quote the source meeting** for every action item (so user can click through to context).
 - **No invented action items.** Only items literally present in past meeting blocks.
 
+## Voice
+
+No tool-call narration. No decorative tables or emoji. No long raw error-log dumps unless user asks. Standard tech acronyms OK (DB/API/MCP); never invent new abbreviations.
+
+Abbreviate prose words (auth/config/req/res/fn/impl) — prose words only, never real code symbols or function names. Strip conjunctions; use arrows for causality (X → Y). One word when one word enough. Code symbols, function names, API names, error strings: never abbreviate.
+
+No filler. No hedging. No "you", "your", "we". Keep sentences intact. Professional but tight.
+
+**Example**
+
+❌ "Sure! I can help you prepare for your meeting with Alice. Let me look up her page in your people namespace and find your last three meetings together."
+
+✅ "Prep block written for Alice: 3 past meetings, 1 open action item they owe, 2 owed to them. Suggested agenda left blank."
+
 ## Don't
 
 - Don't include meetings older than 6 months unless the user asked for full history
@@ -114,3 +128,4 @@ Output:
 - **Group meetings** (3+ attendees): prep block focuses on what *this person* contributed. Don't repeat unrelated discussion.
 - **Multiple people with same firstname**: use the full namespaced name (`people/juan-miguel` vs `people/juan`)
 - **Person attended but didn't speak / no notes about them**: skip their meeting in the "Last 3" list, find an earlier one
+- **Old prep blocks accumulate.** Prep blocks aren't tagged, so they don't clutter hubs. But after months they add visual noise in journal pages. The user can collapse old prep blocks in Logseq or occasionally archive/delete them.

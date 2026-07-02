@@ -61,6 +61,28 @@ What to watch for:
 
 Delete it. From `[[templates]]` and from your hub list. The core invariants (the content + tags + properties model, 3 namespace levels, lowercase-hyphenated names, and the canonical write convention) are what matter — the specific powertag list is yours to curate.
 
+## Can AI agent writes collide with my simultaneous edits?
+
+**Rarely, but possible.** The AI agent writes to your graph through the HTTP API while you might be editing the same journal page in the Logseq app. Both write to the same markdown file. If you save a block at the exact moment the agent appends one, you could get a merge conflict or duplicate content.
+
+In practice this is unlikely — the agent's writes are fast append operations to the end of today's journal, and you're usually editing older blocks or a different line. To be safe, avoid heavy manual editing of today's journal while running a skill that writes to it (`meeting-sync`, `weekly-review`, `brag-finder`). Let the skill finish, then do your own edits.
+
+## How do I back up my graph?
+
+Your graph is plain markdown files — backup is straightforward:
+
+- **Git.** Initialize a repo in your graph folder (or add it to an existing one) and commit periodically. Logseq graph folders live in iCloud Drive at `~/Library/Mobile Documents/iCloud~com~logseq~logseq/Documents/<graph-name>/`.
+- **rsync / Time Machine.** Your iCloud Drive is backed up by Time Machine if you have it enabled. For extra safety, `rsync` the graph folder to another drive.
+- **Version history.** iCloud Drive keeps 30-day version history on macOS. Right-click any file → Browse All Versions.
+
+What matters most: the `journals/` and `pages/` folders. The rest (`.DS_Store`, `assets/`, `logseq/`) can be regenerated or is cache.
+
+## Does `LOGSEQ_EXCLUDE_TAGS` hide the page completely?
+
+**Yes.** Any page carrying a tag listed in `LOGSEQ_EXCLUDE_TAGS` (default: `private`) is fully invisible to the AI — it won't appear in listings, searches, or queries. This is by design: strikedocs and sensitive pages should never surface.
+
+The trade-off: if you tag a page `tags:: private, decisions, brag` (trying to track a performance issue about a past win), the entire page disappears. No partial visibility. If that's a problem, split the content: keep sensitive observations on a `tags:: private` page and file the decision/brag separately without `private`.
+
 ## Where's the support if I get stuck?
 
 1. Re-read [01-setup.md](01-setup.md) and [02-mental-model.md](02-mental-model.md) — most issues are setup typos or model misunderstanding

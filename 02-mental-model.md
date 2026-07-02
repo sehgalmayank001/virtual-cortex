@@ -120,6 +120,12 @@ Companies work the same way under the `companies/` namespace for external vendor
 
 The only invariants worth protecting: max 3 namespace levels, lowercase-hyphenated names, the canonical write convention above, and faceted hubs listing their allowed property values.
 
+### What `system` means
+
+You'll see `tags:: system` on pages the AI agents create as stubs — person pages, merged tag placeholders, and other structural pages that shouldn't clutter the graph view. These pages carry `tags:: system` and `exclude-from-graph-view:: true` so they're invisible in the graph but their backlinks still work.
+
+`system` is not a user tag. Don't put it on your own notes. If it shows up in your tag list, ignore it — it's scaffolding.
+
 ## Next: read [03-powertags.md](03-powertags.md) for the note types
 
 The bundle ships 8 ready-made note types (meetings, brags, decisions, incidents…), each a template that stamps the right tags and properties in one keystroke. The next file walks through them with examples.

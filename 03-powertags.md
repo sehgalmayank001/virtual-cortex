@@ -15,7 +15,7 @@ That's the whole idea: **template + saved view, one keystroke away.** The templa
 
 ---
 
-## The 8 powertags
+## The powertags
 
 | Powertag | Hub | Use when |
 |----------|-----|----------|
@@ -24,6 +24,7 @@ That's the whole idea: **template + saved view, one keystroke away.** The templa
 | `interview` | [[meetings]] | Candidate interview (link the person via `candidate::`) |
 | `brag` | [[brag]] | A personal win, accomplishment, recovered fire |
 | `book-note` | [[books]] | Reading note |
+| `learning-note` | [[learning]] | Something you learned — talk, article, experiment, mistake |
 | `incident` | [[incidents]] | Production issue |
 | `decision` | [[decisions]] | A tech/product decision worth remembering |
 | `strikedoc` | none (private) | Performance documentation for a person or team |
@@ -157,7 +158,39 @@ That's the whole idea: **template + saved view, one keystroke away.** The templa
 
 `status::` values: `to-read`, `reading`, `read`. The hub page can split by status.
 
-## 6. `incident` — production fire
+## 6. `learning-note` — durable takeaway
+
+**When:** You learned something worth remembering — from a talk, article, debugging session, conversation, or your own mistake.
+
+**Template** (`/template learning-note`):
+```
+- 
+  source:: 
+  tags:: learning
+  - ## Key takeaway
+    - 
+  - ## Why it matters
+    - 
+  - ## Apply
+    - TODO 
+```
+
+**Filled example:**
+```
+- 
+  source:: Jane's talk on incident analysis at Q2 eng all-hands
+  tags:: learning, incidents
+  - ## Key takeaway
+    - Postmortems without a "what prevented detection" section miss 60% of improvement opportunities. Add it.
+  - ## Why it matters
+    - Our current postmortem template skips detection gaps — we only document what broke and the fix
+  - ## Apply
+    - TODO Propose adding "Detection gap" section to the incident template
+```
+
+`source::` captures where the learning came from (talk, article, person, debugging session). The `tags::` line tags it with `learning` AND any relevant topic hub so it surfaces in both places.
+
+## 8. `incident` — production fire
 
 **When:** Something broke in prod. Even minor.
 
@@ -217,7 +250,7 @@ That's the whole idea: **template + saved view, one keystroke away.** The templa
 
 A decision doc is the gift you give your future team. "Why didn't we just use X?" — they read this and don't have to re-argue.
 
-## 8. `strikedoc` — performance documentation
+## 9. `strikedoc` — performance documentation
 
 **When:** You're managing someone (or a group) and need to document a pattern of missed expectations. Not for one bad day — for a pattern you've noticed across multiple instances and conversations.
 

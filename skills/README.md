@@ -22,14 +22,14 @@ All seven integrate with the same Logseq structure the bundle defines — they r
 
 Skills are markdown files with frontmatter. They load automatically into compatible AI agents from a known directory.
 
-> **Keep the `assets/` folder.** `cp -r skills/*` copies an `assets/` folder alongside the skill folders. The setup skills (`virtual-cortex-setup`, `graph-init`) read their ready-made hub pages, templates, and config from there, so it must stay next to the skills in your skills directory. Without it, the setup skills have nothing to build from.
+> **Keep the `assets/` folder.** `cp -rL skills/*` follows the symlink and copies the actual files. The setup skills (`virtual-cortex-setup`, `graph-init`) read their ready-made hub pages, templates, and config from there, so it must stay next to the skills in your skills directory. Without it, the setup skills have nothing to build from.
 >
-> `skills/assets/` is a mirror of the bundle's top-level `assets/`. If you customise the canonical files, re-run `scripts/sync-assets.sh` to refresh the mirror before installing.
+> `skills/assets` is a symlink to the bundle's top-level `assets/`. No sync needed — edit files in `assets/` directly.
 
 ### For Claude Code (CLI)
 
 ```bash
-cp -r skills/* ~/.claude/skills/
+cp -rL skills/* ~/.claude/skills/
 ```
 
 Restart your Claude Code session. The skills are now invokable by name (e.g. `/weekly-review`).
@@ -43,7 +43,7 @@ Most tools that support Claude skills look for `SKILL.md` files in a configurabl
 If your tooling looks at `~/.agents/skills/` instead:
 
 ```bash
-cp -r skills/* ~/.agents/skills/
+cp -rL skills/* ~/.agents/skills/
 ```
 
 ---

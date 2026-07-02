@@ -61,7 +61,7 @@ New to Logseq? [Install it first](https://logseq.com) — this assumes you have 
 
 ## Quick start
 
-**AI-assisted (recommended, ~10 min):** install [uv](https://docs.astral.sh/uv/#installation), enable Logseq's HTTP API and create a token, add [mcp-logseq](https://github.com/ergut/mcp-logseq) to your agent, copy the skills (`cp -r skills/* ~/.claude/skills/`), then run `/virtual-cortex-setup`. Full walkthrough: **[01a-setup-ai.md](01a-setup-ai.md)**.
+**AI-assisted (recommended, ~10 min):** install [uv](https://docs.astral.sh/uv/#installation), enable Logseq's HTTP API and create a token, add [mcp-logseq](https://github.com/ergut/mcp-logseq) to your agent, copy the skills (`cp -rL skills/* ~/.claude/skills/`), then run `/virtual-cortex-setup`. Full walkthrough: **[01a-setup-ai.md](01a-setup-ai.md)**.
 
 **Manual (~15 min, no AI):** drop `assets/templates.md` and the hub files from `assets/pages/` into your graph's `pages/`, paste the `:commands` block from `assets/config.edn` into `logseq/config.edn`, restart, and run `/template meeting`. Full walkthrough: **[01b-setup-manual.md](01b-setup-manual.md)**.
 
