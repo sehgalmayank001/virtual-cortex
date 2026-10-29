@@ -7,7 +7,7 @@ Semantic search over your Logseq graph using local AI embeddings. Everything run
 ## What You're Setting Up
 
 - **Ollama** — runs the embedding model locally
-- **mcp-logseq** — MCP server that gives Claude read/write access to Logseq + semantic search
+- **mcp-logseq** — MCP server that gives your agent read/write access to Logseq + semantic search
 - **LanceDB** — local vector database that stores your note embeddings
 - **Config file** — wires everything together
 
@@ -42,10 +42,10 @@ You should get back a JSON response with an `embeddings` array — not an error.
 
 The MCP server needs a token to talk to Logseq's local HTTP API.
 
-1. Open Logseq
-2. Go to **Settings → Developer → HTTP APIs**
-3. Enable the API server
-4. Copy the token — you'll need it in multiple places below
+1. In Logseq: **Settings → Features → "Enable HTTP APIs server"**
+2. Click the **plug icon** in the toolbar → **"Start server"**
+3. In the API panel → **"Authorization tokens"** → create a token
+4. Copy the token — you'll need it in your agent's MCP config below
 
 ### 3. Find Your Logseq Graph Path
 
@@ -117,11 +117,14 @@ Paste this, filling in your actual values:
 }
 ```
 
-**Critical rules for this file:**
-- Use **absolute paths only** — no `~`, no `$HOME`
+**Rules for this file:**
+- Absolute paths are safest. `~` is expanded, but `$HOME` is not
 - The space in `Mobile Documents` is fine inside a JSON string — do not escape it
 - `db_path` must be **outside** your iCloud folder (the path above is correct)
 - If using `nomic-embed-text`, change the model value to `"nomic-embed-text"`
+- Optional: `vector.exclude_tags` keeps pages out of the index only (they stay readable), and `vector.max_chunk_length` (default `10000`) skips oversized blocks
+
+**Hosted embeddings instead of Ollama:** replace the `embedder` block with `{"provider": "openai", "model": "text-embedding-3-small", "api_key_env": "OPENAI_API_KEY"}`. The index stays local, but your note text is sent to the provider. See the upstream [VECTOR_SEARCH.md](https://github.com/ergut/mcp-logseq/blob/main/VECTOR_SEARCH.md) for OpenAI-compatible endpoints.
 
 Validate the JSON before continuing:
 ```bash
@@ -134,11 +137,9 @@ If it prints `valid JSON` you're good. If it errors, check for trailing commas o
 
 ## Step 3 — Run the First Sync
 
-This builds the vector index. It reads your notes, chunks them, and embeds each chunk. Run it once before using Claude.
+This builds the vector index. It reads your notes straight from disk, chunks them, and embeds each chunk. Run it once before using your agent. The sync only needs the config file, not the Logseq token.
 
 ```bash
-export LOGSEQ_API_TOKEN=your_token_here
-export LOGSEQ_API_URL=http://localhost:12315
 export LOGSEQ_CONFIG_FILE=/Users/yourname/.logseq-vector/config.json
 
 uv run --with "mcp-logseq[vector]" python -m mcp_logseq.bin.logseq_sync --once
@@ -188,7 +189,7 @@ Add the `mcp-logseq` entry, filling in your actual token and username:
 **Key differences from the official docs:**
 - No `cwd` field — not needed when installed from PyPI
 - `.[vector]` becomes `mcp-logseq[vector]` — the dot syntax only works in a source checkout
-- All three env vars are required — missing any one of them causes a startup error
+- `LOGSEQ_API_TOKEN` is required (the server won't start without it). `LOGSEQ_CONFIG_FILE` is what turns on the vector tools. `LOGSEQ_API_URL` defaults to `http://localhost:12315`, but keep it explicit
 
 Restart Claude Desktop after saving.
 
@@ -217,9 +218,52 @@ claude mcp get mcp-logseq
 
 ---
 
+## Step 6 — Configure Codex (optional)
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.mcp-logseq]
+command = "uv"
+args = ["run", "--with", "mcp-logseq[vector]", "python", "-c", "from mcp_logseq import main; main()"]
+
+[mcp_servers.mcp-logseq.env]
+LOGSEQ_API_TOKEN = "your_token_here"
+LOGSEQ_API_URL = "http://localhost:12315"
+LOGSEQ_CONFIG_FILE = "/Users/yourname/.logseq-vector/config.json"
+```
+
+Keep the server name `mcp-logseq` — the skills call its tools by that name. Restart Codex after saving.
+
+---
+
+## Step 7 — Configure OpenCode (optional)
+
+Add to `~/.config/opencode/opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mcp-logseq": {
+      "type": "local",
+      "command": ["uv", "run", "--with", "mcp-logseq[vector]", "python", "-c", "from mcp_logseq import main; main()"],
+      "enabled": true,
+      "environment": {
+        "LOGSEQ_API_TOKEN": "your_token_here",
+        "LOGSEQ_API_URL": "http://localhost:12315",
+        "LOGSEQ_CONFIG_FILE": "/Users/yourname/.logseq-vector/config.json"
+      }
+    }
+  }
+}
+```
+
+---
+
 ## Re-adding or Updating the MCP Config
 
-If you need to change the token, fix the args, or update any env var — you cannot edit in place. You must remove and re-add.
+Claude Desktop, Codex, and OpenCode read plain config files: edit the file and restart the app. The rest of this section is for Claude Code, where you change the token, args, or env vars by removing and re-adding the server.
 
 **Always remove first:**
 ```bash
@@ -254,15 +298,17 @@ Check that `Args` shows `--with mcp-logseq[vector]` and all three env vars are p
 
 > **Common mistake:** Running `add-json` when the server already exists gives `MCP server mcp-logseq already exists` and silently keeps the old config. Always remove first.
 
+To upgrade mcp-logseq itself, see [08-updating-mcp-logseq.md](08-updating-mcp-logseq.md).
+
 ---
 
 ## Verify It's Working
 
-In Claude Desktop or Claude Code, ask:
+In your agent, ask:
 
 > "What's the status of my Logseq vector DB?"
 
-Claude will call `vector_db_status` and report chunk count, page count, and last sync time. If you see that, everything is wired up correctly.
+It will call `vector_db_status` and report chunk count, page count, and last sync time. If you see that, everything is wired up correctly.
 
 Then try a semantic search:
 
@@ -270,49 +316,44 @@ Then try a semantic search:
 
 ---
 
-## What Claude Can Now Do
+## What Your Agent Can Now Do
 
-| Ask Claude | What happens |
+| Ask your agent | What happens |
 |---|---|
 | "Find my notes about X" | Hits vector DB — semantic search |
 | "What did I write about Y last month?" | Hits vector DB |
 | "Save this to Logseq as a new page" | Writes via Logseq API |
 | "Append this to my page on Z" | Writes via Logseq API |
 | "Is my search index up to date?" | Calls `vector_db_status` |
-| "Sync the vector DB" | Runs incremental re-embed |
+| "Sync the vector DB" | Prints the `logseq_sync` command to run. It does not sync (see below) |
 
-Logseq must be **open and running** for write operations. Read and vector search work without it.
+`vector_search` works with Logseq closed. Every other tool, reads included, goes through the Logseq HTTP API, so Logseq must be **open with the API server started**.
 
 ---
 
 ## Keeping the Index Fresh
 
-The MCP server auto-syncs in the background when you run a search and files have changed. For continuous sync without waiting:
+The MCP server never writes to the index. The `logseq_sync` CLI is the only writer: `vector_search` just prefixes its results with a staleness note, and `sync_vector_db` only returns the commands to run. If you skip this step, the index stays frozen at your last manual sync.
+
+Keep a watcher running:
 
 ```bash
-export LOGSEQ_API_TOKEN=your_token_here
-export LOGSEQ_API_URL=http://localhost:12315
 export LOGSEQ_CONFIG_FILE=/Users/yourname/.logseq-vector/config.json
 
 uv run --with "mcp-logseq[vector]" python -m mcp_logseq.bin.logseq_sync --watch
 ```
 
-This watches for file changes and re-embeds only what changed.
+It syncs once, then re-embeds only the files that change, until you stop it with Ctrl+C. Leave it running in a terminal tab, or run `--once` whenever `vector_db_status` reports the index out of date.
 
 ---
 
 ## Troubleshooting
 
 ### "LOGSEQ_API_TOKEN environment variable required"
-All three env vars must be set before running any sync command:
-```bash
-export LOGSEQ_API_TOKEN=...
-export LOGSEQ_API_URL=http://localhost:12315
-export LOGSEQ_CONFIG_FILE=/Users/yourname/.logseq-vector/config.json
-```
+The MCP server started without a token. Add `LOGSEQ_API_TOKEN` to the server's env block in your agent's config. (The `logseq_sync` CLI doesn't need it, only `LOGSEQ_CONFIG_FILE`.)
 
 ### "Invalid \escape" in config parsing
-Your config file has bad JSON — usually caused by using `~` in paths or a backslash in a Windows-style path. Use absolute paths with forward slashes only. Validate with:
+Your config file has bad JSON — usually a backslash, for example from escaping the space in `Mobile Documents` or a Windows-style path. Use forward slashes and no escapes. Validate with:
 ```bash
 python3 -c "import json; json.load(open('/Users/yourname/.logseq-vector/config.json'))"
 ```
@@ -326,18 +367,23 @@ ollama list        # confirm it's running
 ollama pull qwen3-embedding:8b   # confirm model is downloaded
 ```
 
-### Vector tools not appearing in Claude
-Check the log:
+### Vector tools not appearing in your agent
+The server logs to stderr, which your agent captures. To get a file you can read, add these to the server's env block and restart the agent:
+```
+LOGSEQ_LOG_FILE=/Users/yourname/.logseq-vector/mcp-logseq.log
+LOGSEQ_LOG_LEVEL=DEBUG
+```
+Then:
 ```bash
-cat ~/.cache/mcp-logseq/mcp_logseq.log | grep -i vector
+grep -i vector ~/.logseq-vector/mcp-logseq.log
 ```
 You should see: `Vector search tools registered (3 tools)`
 
-### Changed embedding model after first sync
+### Changed embedding model, provider, or dimensions after first sync
 ```bash
 uv run --with "mcp-logseq[vector]" python -m mcp_logseq.bin.logseq_sync --rebuild
 ```
-This drops the old DB and re-indexes from scratch. Required any time you switch models.
+This drops the old DB and re-indexes from scratch. Required whenever the provider, model, or `dimensions` changes; rotating an API key doesn't need it.
 
 ### "Operation not permitted" on iCloud path
 Go to **System Settings → Privacy & Security → Full Disk Access**, add your terminal app, restart terminal.

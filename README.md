@@ -10,7 +10,7 @@
 
 ## The headline: AI agent skills
 
-Most "Logseq setups" are dotfiles — themes, shortcuts, plugins. Virtual Cortex ships something newer: **AI agents that do the capture and recall for you.** They run in [Claude Code](https://claude.ai/code), Cursor, or any Claude-compatible agent, and read/write your graph through [mcp-logseq](https://github.com/ergut/mcp-logseq).
+Most "Logseq setups" are dotfiles — themes, shortcuts, plugins. Virtual Cortex ships something newer: **AI agents that do the capture and recall for you.** They run in [Claude Code](https://claude.ai/code), Claude Desktop, Codex, OpenCode, Cursor, or any agent that reads `SKILL.md` files, and read/write your graph through [mcp-logseq](https://github.com/ergut/mcp-logseq).
 
 | Skill | What it does for you |
 |-------|----------------------|
@@ -24,7 +24,7 @@ Most "Logseq setups" are dotfiles — themes, shortcuts, plugins. Virtual Cortex
 
 The skills compose into a daily loop: `meeting-sync` captures → `meeting-prep` recalls → `brag-finder` + `logseq-note` file the wins → `weekly-review` rolls it up. **The system gets denser the more you use it.**
 
-→ Full skill setup and MCP config (Claude Code / Cursor / Claude Desktop) in **[skills/README.md](skills/README.md)**.
+→ Full skill setup and MCP config (Claude Code / Claude Desktop / Codex / OpenCode / Cursor) in **[skills/README.md](skills/README.md)**.
 
 ---
 
@@ -82,6 +82,7 @@ Not sure which? Start with **[01-setup.md](01-setup.md)**.
 | [05-extend.md](05-extend.md) | Adding your own powertags and hubs |
 | [06-faq.md](06-faq.md) | Common questions, plugin recommendations |
 | [07-vector-db-setup.md](07-vector-db-setup.md) | Local semantic search (Ollama + LanceDB) |
+| [08-updating-mcp-logseq.md](08-updating-mcp-logseq.md) | Upgrading mcp-logseq and clearing old version pins |
 | `assets/` | `config.edn`, `templates.md`, and ready-to-drop hub pages |
 | `scripts/` | Helper scripts (e.g. `sync-assets.sh`) |
 | `skills/` | The AI agent skills |

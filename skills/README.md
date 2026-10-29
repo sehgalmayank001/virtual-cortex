@@ -1,6 +1,6 @@
 # Skills — AI agents for setup, capture, and review
 
-Seven ready-to-run AI agent skills for the Logseq Knowledge System. These work with [Claude Code](https://claude.ai/code), Cursor, or any Claude-compatible agent.
+Seven ready-to-run AI agent skills for the Logseq Knowledge System. These work with [Claude Code](https://claude.ai/code), Claude Desktop, [Codex](https://github.com/openai/codex), [OpenCode](https://opencode.ai), Cursor, or any agent that reads `SKILL.md` files.
 
 ## What's included
 
@@ -34,17 +34,29 @@ cp -rL skills/* ~/.claude/skills/
 
 Restart your Claude Code session. The skills are now invokable by name (e.g. `/weekly-review`).
 
-### For other Claude-compatible tools
+### For Codex
 
-Most tools that support Claude skills look for `SKILL.md` files in a configurable directory. Check your tool's docs, then copy as above.
-
-### For `~/.agents/skills/` (alternative location)
-
-If your tooling looks at `~/.agents/skills/` instead:
+Codex loads user skills from `~/.agents/skills/` (`~/.codex/skills/` still works but is deprecated):
 
 ```bash
+mkdir -p ~/.agents/skills
 cp -rL skills/* ~/.agents/skills/
 ```
+
+Restart Codex, then ask for a skill by name ("run weekly-review") or pick it from `/skills`.
+
+### For OpenCode
+
+OpenCode loads skills from `~/.config/opencode/skills/`, and also reads `~/.claude/skills/` and `~/.agents/skills/`. If you already copied the skills for Claude Code or Codex, there is nothing more to do. Otherwise:
+
+```bash
+mkdir -p ~/.config/opencode/skills
+cp -rL skills/* ~/.config/opencode/skills/
+```
+
+### For other tools
+
+Most tools that support skills look for `SKILL.md` files in a known directory. Check your tool's docs, then copy as above. `~/.agents/skills/` is the shared location most agents read.
 
 ---
 
@@ -67,6 +79,8 @@ The skills read and write to your Logseq graph via [mcp-logseq](https://github.c
 The API server must be running whenever you use the skills. If you restart Logseq, you may need to click "Start server" again.
 
 ### Step 2 — Add mcp-logseq to your agent
+
+Name the server `mcp-logseq` in every agent. The skills call its tools by that name (`mcp__mcp-logseq__list_pages`, ...), so a different name such as `logseq` breaks them.
 
 #### Claude Code
 
@@ -123,6 +137,45 @@ which uv
 
 Common locations: `~/.local/bin/uv` (curl install), `/opt/homebrew/bin/uv` (Homebrew). Replace `"command": "uv"` with the full path.
 
+#### Codex
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.mcp-logseq]
+command = "uv"
+args = ["run", "--with", "mcp-logseq", "mcp-logseq"]
+
+[mcp_servers.mcp-logseq.env]
+LOGSEQ_API_TOKEN = "your_token_here"
+LOGSEQ_API_URL = "http://localhost:12315"
+```
+
+Use the plain API address, without `/mcp`: Codex starts mcp-logseq over stdio, and mcp-logseq talks to Logseq's regular HTTP API. If Codex can't find `uv`, use the full path from `which uv`. Restart Codex after saving.
+
+#### OpenCode
+
+Add to `~/.config/opencode/opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mcp-logseq": {
+      "type": "local",
+      "command": ["uv", "run", "--with", "mcp-logseq", "mcp-logseq"],
+      "enabled": true,
+      "environment": {
+        "LOGSEQ_API_TOKEN": "your_token_here",
+        "LOGSEQ_API_URL": "http://localhost:12315"
+      }
+    }
+  }
+}
+```
+
+OpenCode takes `command` as one array and env vars under `environment`, not `env`.
+
 ### Step 3 — Verify the connection
 
 In your agent, ask:
@@ -147,6 +200,10 @@ LOGSEQ_EXCLUDE_TAGS=private,secret
 ```
 
 Any page with `tags:: private` will not appear in listings, searches, or queries.
+
+### Updating mcp-logseq
+
+See [08-updating-mcp-logseq.md](../08-updating-mcp-logseq.md).
 
 ### Meeting tool MCP (for meeting-sync)
 

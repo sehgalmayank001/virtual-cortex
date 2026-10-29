@@ -7,7 +7,7 @@ If you would rather drop the files in by hand with no AI or MCP server, see [01b
 ## What you need
 
 - Logseq installed (desktop version) with a graph open
-- An AI agent that supports skills and MCP: Claude Code, Cursor, or Claude Desktop
+- An AI agent that supports skills and MCP: Claude Code, Claude Desktop, Codex, OpenCode, or Cursor
 - **[uv](https://docs.astral.sh/uv/)**, the Python package manager. Install: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - **[mcp-logseq](https://github.com/ergut/mcp-logseq)**, the MCP server that connects your agent to your graph. No separate install needed, `uv` downloads it on first run, you just add the config.
 
@@ -23,7 +23,7 @@ The API server must be running whenever you use the skills. If you restart Logse
 
 ## Step 2 — Add mcp-logseq to your agent (3 min)
 
-Add the server config to your agent, using the token from Step 1. **Full copy-paste configs for Claude Code, Cursor, and Claude Desktop are in [skills/README.md](skills/README.md).** The short version for Claude Code:
+Add the server config to your agent, using the token from Step 1. **Full copy-paste configs for Claude Code, Claude Desktop, Codex, OpenCode, and Cursor are in [skills/README.md](skills/README.md).** The short version for Claude Code:
 
 ```bash
 claude mcp add mcp-logseq \
@@ -40,7 +40,7 @@ The bundle ships seven skills under `skills/`. Copy them into your agent's skill
 cp -rL skills/* ~/.claude/skills/
 ```
 
-For Cursor or other tools, see [skills/README.md](skills/README.md) for the right directory. Restart your agent session so the skills load.
+Codex reads `~/.agents/skills/`, and OpenCode also picks up `~/.claude/skills/`. For Cursor or other tools, see [skills/README.md](skills/README.md) for the right directory. Restart your agent session so the skills load.
 
 ## Step 4 — Verify the connection (1 min)
 
