@@ -66,6 +66,18 @@ Append to today's journal:
 
 Skip empty sections. Leave "Suggested agenda" blank — the user fills it in.
 
+### 6. Note voice — notes, not docs
+
+The meeting gists are written in your words — keep them note voice: terse, personal, reader is future-you.
+
+- State the point; no hand-holding phrases ("for the user", "in order to")
+- No markdown emphasis (`**bold**`, `*italic*`)
+- Gist over 12 words? Try cutting half
+- Plain language over code jargon — drop class/method names unless the gist is meaningless without them; keep numeric thresholds
+- Swaps: "implemented" → "added", "leveraged"/"utilized" → "used", "applies to" → "needs"
+
+(Full version: logseq-note skill, "Notes are notes, not docs".)
+
 ## Worked example
 
 User: `/meeting-prep alice`

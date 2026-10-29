@@ -1,6 +1,6 @@
 ---
 name: meeting-sync
-description: Sync meetings from any transcript tool (Granola, Otter, Fireflies, Fathom, tl;dv, etc.) into the Logseq journal entry for each meeting's date. Inserts a structured meeting block per meeting tagged with same-block properties (tags::, type::, attendees::), scans the summary for durable rules and surfaces them in a Key insights section, auto-links attendees to people/<firstname> pages (creates stubs if missing). Defaults to most recent meeting; accepts a date or title arg. Use when the user says "sync meetings", "/meeting-sync", "import meeting", "save meeting to logseq", or similar.
+description: Sync meetings from any transcript tool (Granola, Otter, Fireflies, Fathom, tl;dv, etc.) into the Logseq journal entry for each meeting's date. Inserts a structured meeting block per meeting tagged with same-block properties (tags::, type::, attendees::), scans the summary for durable rules and surfaces them in a Key insights section, asks before tagging brag-worthy wins, auto-links attendees to people/<firstname> pages (creates stubs if missing). Defaults to most recent meeting; accepts a date or title arg. Use when the user says "sync meetings", "/meeting-sync", "import meeting", "save meeting to logseq", or similar.
 ---
 
 # Meeting Sync
@@ -22,7 +22,8 @@ The skill also scans the summary for durable rules (system behaviour decisions, 
 - `/meeting-sync today` — all meetings from today
 - `/meeting-sync 2026-06-12` — all meetings on that date
 - `/meeting-sync "Alice 1:1"` — search by title
-- Natural language counts: "import yesterday's meetings", "sync standup", "save my meetings to logseq"
+- `/meeting-sync new` — everything since the last sync (reads the `Meeting Sync` page, see step 7)
+- Natural language counts: "import yesterday's meetings", "sync standup", "save my meetings to logseq", "sync everything since last time"
 
 If nothing specified, default to **the most recent meeting**.
 
@@ -109,6 +110,8 @@ The block format, attendee resolution, key insights extraction, and TODO discipl
 
 Use the provider's list call with appropriate date filtering.
 
+For `new`: read the `Meeting Sync` page and fetch from its `last-sync::` date through today. Start on the `last-sync` day itself, not the day after — meetings later that day may have landed after the last run; the idempotency check (step 4) skips the ones already written. If the page doesn't exist, there's no previous `new` run: say so and ask for a start date instead of guessing.
+
 ### 2. Resolve attendees → people pages
 
 Parse the attendees list from the provider. Skip:
@@ -160,6 +163,55 @@ Meeting summaries often contain durable knowledge buried in the discussion: deci
 
 When strong rule signals are detected, **add a `## Key insights` section as the FIRST child** of the meeting block, and add the topic page(s) to the block's `tags::`. When no rule signals exist, skip the section.
 
+### 4b. Note voice — notes, not docs
+
+Applies to everything the skill writes in its own words: `Key insights` bullets, block titles, rewritten action items. (The provider summary itself is preserved as-is.)
+
+Notes are terse and personal — the reader is future-you, not a newcomer. Cut:
+
+- Hand-holding phrases ("for the user", "must be... to qualify") — just state the rule
+- Redundant restatement ("by design" AND a quote confirming it — pick one)
+- Markdown emphasis (`**bold**`, `*italic*`)
+- Long sentences — bullet over 12 words? Try cutting half
+
+Word swaps: "implemented" → "added"/"did", "leveraged"/"utilized" → "used", "in order to" → "to", "applies to" → "needs".
+
+Plain language over code jargon: drop `ClassName#method`, table/column names unless the rule hinges on that exact name. Keep numeric thresholds — those are signal.
+
+Bad: "The feature only applies to users meeting condition X and condition Y — this is by design."
+Good: "feature needs X AND Y. Otherwise = no go."
+
+Match the user's tone. Informal in, informal out. (Full version: logseq-note skill, "Notes are notes, not docs".)
+
+### 4c. Scan summary for brag signals — ASK before tagging
+
+Meeting summaries often record a win the user forgot to log: something shipped, led, delivered, or a bug correctly diagnosed. Don't auto-tag these — brag is subjective, so surface the candidate and let the user decide.
+
+**Brag signals attributable to the user** (case-insensitive, the user's own work):
+- "shipped" / "deployed" / "launched" / "delivered" / "merged" (esp. with PR numbers)
+- "led" / "drove" / "owned" (a migration, launch, incident)
+- "mentored" / "onboarded"
+- "reduced [latency|cost|time]" / "saved [hours|days|$]" — keep the number
+- User proving something *isn't* a bug (correct diagnosis = brag)
+
+**Unattributed wins — surface as candidates too (don't assume, ask).** AI summaries often strip attribution: the user's best wins show up as ownerless bullets — `Idea:`, `Decision:`, `Proposal:`, or a win-signal bullet with no name attached. Don't skip these because ownership can't be confirmed; include them as candidates and let the prompt confirm ownership. (Real miss this guards: an "Idea: use X to do Y" bullet that was actually the user's suggestion.)
+
+**Skip** (same as brag-finder): bullets explicitly owned by a *named teammate*, "tried but failed", "started working on" (incomplete), pure coordination ("synced with X"), canceled items.
+
+**Dedup against already-logged brags.** Before prompting, read the target journal day and skip any candidate already captured in a block tagged `brag` (the user may have logged it manually, or `logseq-note`/`brag-finder` did). Match on gist, not exact wording.
+
+When candidates survive, ask once per meeting — a multi-select question if your agent supports one — with one option per candidate (label = terse note-voice title, description = verbatim summary phrasing), and let the user reject all:
+
+```
+Brag? This meeting has win-like activity. Tag any as brag?
+  [ ] <terse win 1> — "<verbatim summary phrasing>"
+  [ ] <terse win 2> — "<verbatim summary phrasing>"
+```
+
+Only ask when signals exist — never prompt on a routine status meeting. If the user picks none, add no brag tag.
+
+**On confirmation:** add `brag` to the meeting block's `tags::` line (`tags:: meetings, brag, <work-hub>`). The meeting block surfaces on the brag hub — no separate brag block, no `what-i-did::`/`impact::` scaffolding (that's brag-finder's job; here the meeting block is the record). Title stays note-voice per 4b.
+
 ### 5. Write the journal block
 
 For each meeting, append one block to the journal page (mode=append). When syncing multiple meetings same day, **order chronologically ascending** (earliest first) so the journal reads top-to-bottom through the day. **Add an empty block between meetings** as a visual separator.
@@ -209,7 +261,7 @@ Notes:
 
   Write the value bare — `type:: 1on1`. The leading digit only needs quoting on the *query* side (`(property type "1on1")`), which the hub already does; the stored property value is the plain string.
 - **`attendees::` aggregates by person.** Comma-separated `[[people/x]]` references. Backlinks on each person page surface every meeting with them (entity-aggregator pattern) — no "series" page needed.
-- **Action items: TODO only if the user owns the item.** If the parenthetical assignee includes the user's first name (e.g. `(Alice)` or `(Alice + Bob)`, assuming the user is "Alice") or there's no assignee, prefix with `TODO`. If assigned to someone else only (e.g. `(Bob)`, `(Charlie)`), leave as plain bullet. Don't pollute the user's TODO list with other people's work.
+- **Action items: TODO only for today's meetings, and only if the user owns the item.** For a meeting dated today: if the parenthetical assignee includes the user's first name (e.g. `(Alice)` or `(Alice + Bob)`, assuming the user is "Alice") or there's no assignee, prefix with `TODO`. If assigned to someone else only (e.g. `(Bob)`, `(Charlie)`), leave as plain bullet. Only substantive tasks (code, builds, non-trivial investigations) get `TODO` — coordination ("sync with Bob"), admin steps ("create a ticket"), and same-session one-offs stay plain. For a meeting on any earlier day, write every action item as a plain bullet: by sync time it's already tracked elsewhere or done, and a stale TODO is noise.
 - **No tool-specific ID properties, no source attribution.** Match by title + date for idempotency. Don't add "synced from Granola" lines.
 
 ### 6. Confirm
@@ -223,6 +275,23 @@ Synced N meetings to [[Jun 12th, 2026]]:
 {K people stubs created}
 ```
 
+### 7. Stamp the sync (`new` only)
+
+After a `new` run writes its meetings, record the run on the `Meeting Sync` page with `update_page` (`mode: replace`, overwriting the previous stamp). If the page doesn't exist yet, create it with `create_page`. `new` reads `last-sync::` from here.
+
+```markdown
+tags:: system
+exclude-from-graph-view:: true
+
+- last-sync:: {YYYY-MM-DD}
+- range:: {start-date} → {end-date}
+- meetings-synced:: {N}
+```
+
+- `last-sync` is today's date. `range` is the date window fetched. `meetings-synced` is the count written this run.
+- Only `new` stamps. It's the one mode that covers an unbroken range up to today; stamping after a single-date or most-recent sync would move `last-sync` past days that were never synced.
+- Machine-written status record — no prose or commentary on this page.
+
 ## Entity-aggregator patterns (do follow)
 
 - **Entity is the aggregator.** Each meeting is one block in that day's journal. The attendee link does the grouping automatically — open `people/<person>` to see every meeting with them. No "series" page needed for recurring 1:1s.
@@ -234,12 +303,12 @@ Synced N meetings to [[Jun 12th, 2026]]:
 - **No transcript dumping.** The tool's summary is the source of truth. Never pull raw transcripts.
 - **No source attribution.** No "synced from X" lines, no tool-specific ID properties. Just the meeting content.
 - **Strip formatting artifacts.** Tools often add escape characters (e.g. `\~30 minutes` → `~30 minutes`). Clean them.
-- **TODO discipline.** Only the user's own action items become TODOs. Everyone else's work stays as plain text bullets.
+- **TODO discipline.** Only today's meetings produce TODOs, and only for the user's own substantive tasks. Past meetings are reference notes. Everyone else's work stays as plain text bullets.
 - **Tag and facet via same-block properties.** `tags:: meetings` (+ `<work-hub>`/topics, all bare) groups; `type:: 1on1`/`interview` (bare) facets. Write them as un-dashed lines directly under the title so they attach to the parent block. Generic meetings need no `type::`.
 
 ## Worked example
 
-**Input:** `/meeting-sync 2026-06-12` — found 3 meetings
+**Input:** `/meeting-sync today` on Jun 12th, 2026 — found 3 meetings
 
 **Example A — meeting with rule signals detected** (user is "Alice"; teammates Bob, Charlie):
 
@@ -281,7 +350,7 @@ The `Key insights` section surfaces durable rules at the TOP of the meeting bloc
 
 `type:: 1on1` lands this under the **1:1s** facet on the meetings hub as well as All meetings. Most group meetings have no `type::` — don't force one.
 
-**TODO discipline:** Bob-only items are plain bullets; Alice-owned (or shared) items are `TODO`. The empty `-` between meeting blocks gives visual separation in Logseq.
+**TODO discipline:** these are today's meetings, so Alice-owned (or shared) substantive tasks are `TODO`; Bob-only items are plain bullets. Synced a week later, every item would be a plain bullet. The empty `-` between meeting blocks gives visual separation in Logseq.
 
 **People stubs created:** `people/bob`, `people/charlie` (created as needed; existing pages reused).
 

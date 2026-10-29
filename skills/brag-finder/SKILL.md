@@ -100,6 +100,17 @@ Notes:
 - `impact::` is left blank — numerical impact is the user's to fill in
 - `what-i-did::` is the verbatim phrasing the user originally wrote — don't rewrite it
 
+### 7. Note voice for titles — notes, not docs
+
+The one-line title is the only thing you phrase yourself (everything else is verbatim). Keep it note voice: terse, personal, reader is future-you.
+
+- No markdown emphasis, no hand-holding phrases
+- Over 12 words? Try cutting half
+- Swaps: "implemented" → "added"/"did", "leveraged"/"utilized" → "used", "in order to" → "to"
+- Plain language over code jargon — drop class/method names unless the title is meaningless without them; keep numeric thresholds (those sell the brag)
+
+(Full version: logseq-note skill, "Notes are notes, not docs".)
+
 ## Worked example
 
 ```

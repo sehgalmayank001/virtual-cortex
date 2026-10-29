@@ -72,6 +72,18 @@ Skip empty sections. If there were no brags, don't add an empty "### Wins" secti
 
 Leave these blank for the user to fill in. No markdown emphasis — notes don't need styling.
 
+### 6. Note voice — notes, not docs
+
+Extracted items stay in the user's own words (see Hard constraints). But anything you phrase yourself — meeting one-liners, section counts, gap notes — uses note voice: terse, personal, reader is future-you.
+
+- State the point; no hand-holding phrases ("for the user", "in order to")
+- No markdown emphasis (`**bold**`, `*italic*`)
+- Bullet over 12 words? Try cutting half
+- Plain language over code jargon — drop class/method names unless the line is meaningless without them; keep numeric thresholds
+- Swaps: "implemented" → "added", "leveraged"/"utilized" → "used", "applies to" → "needs"
+
+(Full version: logseq-note skill, "Notes are notes, not docs".)
+
 ## Worked example
 
 For a user reviewing Jun 12-18:

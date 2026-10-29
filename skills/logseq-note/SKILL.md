@@ -5,333 +5,163 @@ description: Save a piece of conversation, decision, learning, or idea to the us
 
 # Save to Logseq
 
-Captures something from the current conversation into Logseq. Picks the right spot, **detects every applicable tag (not just one)**, writes it cleanly, confirms.
+Capture one takeaway from the conversation into Logseq. Terse. Tagged. In the user's voice.
 
-## How to invoke
+Invoke on: `/logseq-note`, "save this to logseq", "logseq this", "remember this", "note this down". All the same.
 
-- Slash: `/logseq-note`
-- Natural: "save this to logseq", "logseq this", "remember this", "add this to my notes", "note this down"
+## The one rule that matters: notes are notes, not docs
 
-Both work. Treat them the same.
+You are writing for future-you, who already has the context. Not for a newcomer.
 
-## What to save
+**Length budget (hard):**
+- Title line + **at most 3 bullets**. Most notes are title + 1 bullet.
+- Each bullet is **one line, ≤ 12 words**. Over 12? Cut half.
+- If it can't fit, it's probably two notes — or the user wants a page (ask).
 
-The user usually means "the thing we just talked about" — could be:
-- A decision we just made
-- A trick or learning from this session
-- A list of things to do
-- A discussion summary
-- An idea worth keeping
+**Cut on sight:**
+- Hand-holding: "for the user", "this is by design and the UI confirms it" — state the rule once.
+- Restatement: don't explain the same thing two ways.
+- Markdown emphasis (`**bold**`, `*italic*`), section headings for a single point.
+- Class names, table/column names, method jargon — unless the point literally hinges on that exact name. Keep numeric thresholds; those are signal.
 
-Ask the user what specifically if it's not obvious. Don't dump the whole conversation.
+**Word swaps:** implemented→did/added, leveraged/utilized→used, architected→built, "applies to"→needs, "in order to"→to.
+
+Bad (docs voice):
+> The feature only applies to users meeting condition X and condition Y. Users not meeting both will not see it — this is by design, and the UI states "...".
+
+Good (notes voice):
+> feature needs X AND Y. else no go.
+
+Match the user's tone. Informal in, informal out.
 
 ## Steps
 
-### 1. Read the room
+### 1. Find the takeaway
 
-Skim the recent conversation. Figure out:
-- What's the one-line summary?
-- What topic does it belong to? (look at the user's hubs — typically python, react, AI, learning, plus work-specific hubs)
-- Is it small enough for a journal block, or does it need its own page?
+One line: what's worth keeping? Usually the thing just discussed — a decision, a trick/learning, a todo list, a discussion summary, or an idea worth keeping. If unclear, ask — don't dump the whole conversation. Skip trivia ("user asked about X").
 
-### 1a. Surface the rule, don't bury it — REQUIRED for debugging/analysis content
+### 2. Scan for ALL tags — REQUIRED
 
-If the content is a debugging analysis, customer case, or "Not a bug" explanation, it usually contains TWO kinds of information mixed together:
+Content is often 2-4 tags at once. Scan every category — never pick the obvious one and stop.
 
-- **Case data** (ephemeral) — specific ticket IDs, user IDs, timestamps
-- **Durable knowledge** (timeless) — how the system actually works, rules, constants, debugging steps
+**brag** — trigger phrases: "shipped", "deployed", "merged", "delivered", "launched"; "fixed", "debugged", "diagnosed", "ruled out", "identified" (a pattern/root cause/bug); "led", "mentored", "onboarded"; "reduced", "saved", "improved" (with a metric); "decided", "closed the loop on", "resolved". Also: **the user proving something *isn't* a bug** (correct diagnosis = brag). Any performance-review-worthy work.
 
-**Both stay in the same journal block** — but the rule must be SURFACED, not buried below case data. And the block must be **tagged with the topic** so the rule is findable via the topic hub later.
-
-**Signals that durable knowledge is present:**
-
-- "by design", "always", "only when", "must be"
-- "X works like Y" / "X requires Y" / "if X then Y"
-- Conditions, percentages, thresholds, constants
-- "To check this, look at..." (debugging methodology)
-- Multiple cases analyzed against the same underlying rule
-
-**When detected, do three things:**
-
-1. **Reorder content** so the rule is the FIRST child heading, debugging steps are SECOND, case data is LAST
-2. **Tag with the topic** as a hub link (e.g. `<work-hub>/token-bonus` or `<work-hub>/subscriptions`) — this is what makes the rule discoverable later
-3. **Use distinct headings** (`## Rule`, `## Debugging`, `## Cases`) so a reader sees the rule first
-
-**Example proposal:**
-
-> "Detected a system rule here. Saving as a journal block with structured headings — Rule first, Debugging second, Cases last. Tagging with `brag, <work-hub>, <work-hub>/token-bonus` so it shows on the token-bonus topic page. (No `decisions` — nothing was decided, it's a diagnosis.) Sound good?"
-
-**Formatting — write tags as a same-block property on the title block.**
-
-Put the note's tags on a `tags::` line directly under the title bullet (un-dashed), the same shape `/template` produces. The tags attach to the parent (title) block, so the note surfaces on every hub you list.
-
-✅ **CORRECT — `tags::` as a same-block property:**
-
-```
-- <title>
-  tags:: decisions, brag, <work-hub>, <work-hub>/<topic>
-  - ## Rule
-    - ...
-```
-
-❌ **WRONG — `tags::` on a dashed child bullet:**
-
-```
-- <title>
-  - tags:: decisions, brag
-  - ## Rule
-```
-
-The dash makes `tags::` a separate child block, so the title stays untagged. Keep property lines un-dashed, right under the title.
-
-**Self-check before writing:**
-
-1. `tags::` is an un-dashed line immediately under the title bullet
-2. Scalar values (`type::`, `status::`) are written bare — never bracketed
-3. If the note doesn't appear on its hub after writing, re-index the graph once (Logseq graph menu → Re-index) — file/API writes can lag Logseq's live index
-
-**Worked example of the block structure** (everything stays in ONE block in today's journal):
-
-```markdown
-- <ticket-A> + <ticket-B> not bugs — <topic>
-  tags:: brag, <work-hub>, <work-hub>/<topic>
-  - ## Rule
-    - <condition that must hold> for <behavior> to happen, in plain words
-    - <what the system keys off> — name the concept, not the class
-  - ## Debugging
-    - Check <key thing> first — if <value>, done
-    - Otherwise check <related history> for <pattern>
-    - <latest wins / first wins / etc.>
-  - ## Cases
-    - <ticket-A> — <one-line case summary>. Not a bug.
-    - <ticket-B> — <one-line case summary>. User-initiated / system-caused / etc.
-```
-
-Fill the angle-bracket placeholders with the specific terms from the user's input. The pattern is what matters — the bullets are short, the rule comes first, the cases come last.
-
-Now:
-- Future-you opens `<work-hub>/token-bonus` → sees this entry via backlinks → reads the rule first
-- The case context is still there (last section) if needed
-- One journal entry, one place, but the rule isn't buried
-
-**When NOT to apply this:**
-
-- Pure case work with no general lesson ("user Y reported issue Z, fixed by Q")
-- Decisions that are already context-specific ("we chose X for Q3 capacity")
-- Routine debugging ("found a typo, fixed it")
-
-If the analysis is just "this user did X" with no underlying rule, just use the standard structure (no `## Rule` heading needed).
-
-### 1b. Scan for multi-tag signals — REQUIRED
-
-A piece of content can be a decision AND a brag AND tagged with a project at the same time. Scan for ALL of these, not just the most obvious one.
-
-**Brag-worthy signals → propose `brag` as one of the tags:**
-- "shipped", "deployed", "merged", "delivered", "launched"
-- "fixed", "debugged", "diagnosed", "ruled out", "identified" (a pattern, root cause, bug)
-- "led", "mentored", "onboarded"
-- "reduced", "saved", "improved" (with a metric)
-- "decided", "closed the loop on", "resolved"
-- **The user proving something *isn't* a bug** (correct diagnosis = brag)
-- Any performance-review-worthy work
-
-**Decision signals → propose `decisions`:**
-- A decision needs an actual CHOICE: option X picked over option Y, or a deliberate "we will / won't do Z".
+**decisions** — needs an actual CHOICE: option X over Y, or a deliberate will/won't-do.
 - "We chose X over Y because..."
 - "After investigating, we'll proceed with..."
 - A trade-off comparison with a chosen path
 - "We'll leave it / won't fix / change the process" — a forward-looking call counts.
 
-**A diagnosis is NOT a decision.** "Not a bug", "by design", "root cause is X" with no choice made = a `brag` (correct diagnosis) plus the topic hub. Do NOT add `decisions` just because something was explained or ruled out. Only add it if someone actually decided to do or not do something as a result. When unsure, leave `decisions` off and ask.
+**A diagnosis is NOT a decision.** "Not a bug", "by design", "root cause is X" with no choice made = `brag` (correct diagnosis) + the topic hub, NOT `decisions`. Don't add `decisions` because something was explained or ruled out — only if someone decided to do or not do something as a result. Unsure → leave off, ask.
 
-**Incident signals → propose `incidents`:**
-- Production downtime, outages, customer impact
-- "p1 / p2 / sev1 / sev2"
-- Timeline of events leading to a failure
+**incidents** — production downtime, outage, customer impact; "p1/p2/sev1/sev2"; a timeline of events leading to a failure.
 
-**People signals → propose `[[people/<name>]]`:**
-- Names in attendee/discussion context
-- Quoted feedback or decisions credited to a person
+**[[people/<name>]]** — names in attendee/discussion context; feedback or decisions credited to a person.
 
-**Project signals → propose work hub tag:**
-- Ticket IDs like PROJ-1234, JIRA codes → that company's hub
-- Codebase names, internal product names → matching work hub
-- Mentions of specific work people → that work context
+**work hub + topic** — ticket IDs (PROJ-1234, JIRA codes) → that company's hub; codebase/internal-product names → matching work hub; specific work people → that work context. Add `<work-hub>/<topic>` for the topic page.
 
-**Never pick one tag and stop.** Most notes have 2-4 tags. A debugging analysis that proves a reported bug wasn't real is a `brag` AND a work-hub (and topic) entry — but NOT a `decision` unless a choice was made off the back of it.
+**Never pick one tag and stop. Most notes have 2-4 tags.** A debugging analysis that proves a reported bug wasn't real is `brag` AND work-hub AND topic — but NOT `decisions` unless a choice was made off the back of it.
 
-### 2. Suggest a plan with the full tag set
+Other entity hubs to tag against when they fit: `meetings`, `companies`, `books`. Topic/tech/life hubs too (`python`, `react`, `AI`, `AWS`, `learning`, `career`...). Run `list_pages` if you need the user's real hubs. Don't invent hubs mid-flow.
 
-Tell the user what you'll do in one line, with ALL detected tags. Explain *why* each non-obvious tag was suggested.
+### 3. Tag format — `tags::` same-block property under the title
 
-**Good example:**
-> "Saving as a journal block today, tagged `decisions, brag, <work-hub>`. Brag is for diagnosing both tickets as non-bugs. Title: '<ticket-A> + <ticket-B> not bugs — <one-line topic>'. Sound good?"
+Put tags on a `tags::` line directly under the title bullet, **un-dashed** (the shape `/template` produces). The tags attach to the parent title block, so the note surfaces on every hub you list.
 
-**Bad example** (passive dump):
-> "Saving this to logseq."
+✅ Correct — `tags::` un-dashed, right under the title:
+```
+- <title>
+  tags:: brag, <work-hub>, <work-hub>/<topic>
+  - <one short bullet>
+```
 
-The bad version loses tags and context. The good version names tags and explains why — user can correct in one word.
+❌ Wrong — dashed, so it becomes a separate child block and the title stays untagged:
+```
+- <title>
+  - tags:: brag, <work-hub>
+```
 
-Only ask multiple questions if categorization is truly unclear after step 1a.
+Self-check: `tags::` is un-dashed, immediately under the title; scalar props (`type::`, `status::`) written bare, not bracketed; hub names with `/` (like `<work-hub>/<topic>`) go in the comma list as-is. If the note doesn't show on its hub after writing, re-index once (Logseq → Re-index) — API/file writes lag the live index.
 
-### 3. Pick journal block vs own page
+### 4. Propose in one line, then write
 
-**Journal block** (default):
-- Single decision, learning, or idea
-- Fits in 1–10 lines
-- You don't expect to link to it from other pages
+State the plan with the full tag set and why any non-obvious tag is there. One line, not three questions:
+> "Journal block today, `tags:: brag, <work-hub>`. brag = diagnosed both tickets as non-bugs. Title: '<A> + <B> not bugs — <topic>'. ok?"
 
-**Own page**:
-- Has 3+ distinct sections or headings
-- The user will reference it from multiple places later
-- It's a reusable doc (architecture overview, runbook, plan)
-- Or the user explicitly said "make a page for this"
+On confirm, write it. Default target: today's journal (`mcp__mcp-logseq__update_page`, append). Confirm where it landed in one line — no "Saved successfully!".
 
-When in doubt, journal. Easier to promote later than to demote.
+Why the scan matters — same content, two outcomes:
+> ❌ passive dump: `- The reported issues are not bugs because...` → no tags, lost in the journal forever.
+> ✅ scanned: detect brag (correct diagnosis) + work-hub + topic, NO `decisions` (no choice made). Tag `brag, <work-hub>, <work-hub>/<topic>`, title names the tickets. Surfaces on every hub.
 
-### 4. Reference the user's existing hubs
+### 5. Journal block vs own page
 
-The user's graph has these hubs you can tag against:
+Journal block is the default. Own page only if: 3+ real sections, referenced from many places, a reusable doc (runbook/plan/architecture), or the user says so. When in doubt, journal — easier to promote later.
 
-**Entity hubs (for new instances):**
-- `meetings`, `people`, `companies`, `brag`, `books`, `incidents`, `decisions`
-
-**Topic hubs (use as `tags::`):**
-- Work project namespaces (run `list_pages` to discover the user's actual hubs)
-- `python`, `react`, `AI`, `system-design`, `AWS`, `GCP` — tech topics
-- `learning`, `career`, `diet` — life areas
-
-A note can have multiple tags. E.g. a Python-related decision at the user's job → `tags:: decisions, python, <work-hub>`.
-
-### 5. Write the block
-
-**Journal block format** (tags as a same-block property — see "Formatting" section above):
-
+Journal block format:
 ```markdown
 - {one-line title}
   tags:: tag1, tag2, tag3
-  - {key points in plain language}
-  - {one more point}
+  - {key point in plain language}
 ```
 
-**Own page format** (page properties as the first block, then content):
-
+Own page format — tags as a page property on the first block, then content:
 ```markdown
 tags:: {comma-separated tags}
 
 ## Context
 {why this exists}
-
 ## What
 {the content}
-
-## Why / decision (if applicable)
+## Why / decision (if any)
 {reasoning}
 ```
 
-### 6. Code snippets
+## Rule-surfacing — rare, and still short
 
-Strip them out by default — they're rarely the point. Keep only the explanation.
+Debugging/analysis notes mix two things: **case data** (ephemeral — ticket IDs, user IDs, timestamps) and **durable knowledge** (timeless — how the system works, rules, constants). When durable knowledge is present, surface the rule instead of burying it under case data, and tag the topic hub so it's findable later.
 
-**Exception:** include the snippet if the explanation needs it (e.g. "this regex bug is on line X" — keep the line; "the fix was a one-character change" — keep it).
+A reusable rule is present when you see: "by design / always / only when / must be", "X works like Y" / "X requires Y" / "if X then Y", a condition/threshold/constant, "to check this, look at..." (a debugging method), or several cases all explained by the same underlying rule. Absent all of these it's just case work — skip this section.
 
-When in doubt, paraphrase: "the fix was changing `==` to `===`" beats pasting the whole function.
-
-### 7. Worked example — multi-tag detection
-
-User dumps a debugging analysis in conversation (two reported bugs, both turn out to be not bugs after investigation), then says "save this to logseq".
-
-**Wrong response** (passive dump):
+When detected: lead with the rule (title or first bullet), cases after, one line each, tagged with the topic hub. Do NOT manufacture `## Rule` / `## Debugging` / `## Cases` headings — one `rule:` bullet does it. Keep the length budget.
 
 ```markdown
-- The reported issues are not bugs because...
+- <A> + <B> not bugs — <topic>
+  tags:: brag, <work-hub>, <work-hub>/<topic>
+  - rule: <the condition, plain words, one line>
+  - <A>: <one-line case>. <B>: <one-line case>.
 ```
 
-No tags. Lost in the journal forever.
+**When NOT to apply** — skip the rule bullet, just write the takeaway:
+- Pure case work, no general lesson ("user Y reported Z, fixed by Q")
+- A decision already context-specific ("we chose X for Q3 capacity")
+- Routine debugging ("found a typo, fixed it")
 
-**Right response:**
+## Code snippets
 
-Detect:
-- User correctly diagnosed both reports as non-defects → **brag** signal
-- Tickets mention a specific product area → **work hub** + topic signal
-- No choice was made off the back of it → NO `decisions` tag
-
-Suggest:
-> "Saving as a journal block today, tagged `brag, <work-hub>, <work-hub>/<topic>`. Brag is for diagnosing both as non-bugs. Title: '<ticket-A> + <ticket-B> not bugs — <one-line topic>'. Sound good?"
-
-On confirmation, write a block with:
-- A clear one-line title naming the tickets and topic
-- A `tags::` same-block property under the title for all detected tags
-- Bullets in plain language: what the system actually does + why each ticket isn't a defect
-- A final "Action" bullet if next step is needed
-
-This entry surfaces on the `brag` hub and the work/topic hubs. If the team later decides "won't fix / change X" off the back of it, THAT follow-up is the `decisions` note — separate from this diagnosis.
-
-### 8. Notes are notes, not docs
-
-This is the most common failure mode: writing detailed documentation when the user wanted terse notes.
-
-**Notes** = punchy, personal voice, assumes the reader knows the context (because it's future-you).
-**Docs** = thorough, reader-friendly, explains for newcomers.
-
-**The skill writes NOTES.** Cut:
-
-- Hand-holding phrases: "for the user", "must be... to qualify", "if X then Y" — just state the rule
-- Redundant restatement: don't say something is "by design" AND quote the UI text confirming it — pick one
-- Markdown emphasis: no `**bold**` or `*italic*` — notes don't need styling
-- Long sentences: chop them. Period. Done.
-
-**Word-level swaps:**
-- "Implemented" → "did" / "set up" / "added"
-- "Leveraged" / "Utilized" → "used"
-- "Architected" → "designed" / "built"
-- "applies to" → "needs"
-- "in order to" → "to"
-- "the new checkout's interval is what X writes" → "new interval wins (X writes it)"
-
-**Compression test:** if a bullet has more than 12 words, try cutting half. Usually possible.
-
-**Bad (docs voice):**
-> The <feature> only applies to users meeting condition X and condition Y. Users not meeting both conditions will not see the feature — this is by design, and the UI even states "<exact quote from UI>".
-
-**Good (notes voice):**
-> <feature> needs X AND Y. Otherwise = no go.
-
-Same info. Half the words. Reads like the user wrote it.
-
-**Default to plain language. Add code references only when needed.** Notes describe behaviour in everyday words, not class names. Drop `ClassName#method`, table/column names, and method jargon unless the note is meaningless without them (e.g. the rule literally hinges on that exact field, or the user asks to keep them). Keep specific numeric thresholds — those are signal. When unsure, write it plain and leave the code out.
-
-Match the user's tone. Informal in, informal out.
-
-### 9. Confirm
-
-After writing, tell the user where it went in one line:
-
-> "Saved to [[<today>]] under `decisions, brag, <work-hub>`."
-
-## Tools to use
-
-- `mcp__mcp-logseq__update_page` (append mode) for journal blocks or appending to existing pages
-- `mcp__mcp-logseq__create_page` for new dedicated pages
-- `mcp__mcp-logseq__get_page_content` to check if a page exists first
-- `mcp__mcp-logseq__list_pages` if you need to see all hubs
+Strip by default. Paraphrase: "fix was `==` → `===`" beats pasting the function. Keep a snippet only if the point is unintelligible without it.
 
 ## Journal page name format
 
-Logseq journal pages: `<MonAbbr> <D><ordinal>, <YYYY>` — e.g. `Jun 13th, 2026`, `Jan 1st, 2026`, `Mar 23rd, 2025`.
+`<MonAbbr> <D><ordinal>, <YYYY>` — e.g. `Jun 13th, 2026`, `Jan 1st, 2026`, `Mar 23rd, 2025`.
 
-Months: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec.
+Months: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec. Ordinals: 1st/2nd/3rd, 4th–20th "th", 21st/22nd/23rd, 24th–30th "th", 31st "st".
 
-Ordinals: 1st, 2nd, 3rd; 4th–20th use "th"; 21st, 22nd, 23rd; 24th–30th use "th"; 31st use "st".
+## Tools
+
+- `mcp__mcp-logseq__update_page` (append) — journal blocks, appending to a page
+- `mcp__mcp-logseq__create_page` — new dedicated page
+- `mcp__mcp-logseq__get_page_content` — check a page exists first
+- `mcp__mcp-logseq__list_pages` — discover hubs
 
 ## Hard constraints
 
-- **Default to journal block.** Own pages are the exception.
-- **Always run step 1a (multi-tag scan).** Skipping it = the passive dump failure mode.
-- **Suggest the full tag set in one line, don't ask three questions.**
-- **Don't include the whole conversation.** Only the takeaway.
-- **Don't make up tags.** Use ones already in the user's graph.
-- **Don't add fluff** like "Saved successfully!" — say where it went.
+- Stay within the length budget — verbose = wrong, even if accurate.
+- Always run the multi-tag scan (step 2). Skipping it = the passive-dump failure.
+- Default to a journal block; own pages are the exception.
+- Suggest the full tag set in one line — don't ask three questions.
+- Only the takeaway, never the whole conversation. Use existing hubs, don't invent tags.
+- Say where it landed in one line — no "Saved successfully!".
 
 ## Voice
 
@@ -349,20 +179,15 @@ No filler. No hedging. No "you", "your", "we". Keep sentences intact. Profession
 
 ## Don't
 
-- Don't dump full code blocks unless the explanation needs them
-- Don't write in AI voice ("Here's what we did:") — write in user voice
-- Don't ask the user to re-explain what they just said
-- Don't pick one tag when content has multiple signals — always scan all 5 signal categories in step 1a
-- Don't create a new hub or powertag mid-flow — propose it after, separately
-- Don't save trivial stuff ("user asked about X") — only durable takeaways
-- Don't add source attribution like "from Claude Code session" / "from Cursor chat". Noise.
+- Dash the `tags::` line (makes it a child block, untags the title).
+- Pick one tag when there are several signals.
+- Ask the user to re-explain what they just said.
+- Dump code blocks, the whole conversation, or AI voice ("Here's what we did:").
+- Invent a hub/powertag mid-flow (propose it after, separately), or add source attribution ("from Claude Code session").
 
 ## When unsure
 
-Ask one focused question with 2-3 concrete options. Examples:
-- "Tag with `decisions, brag, <work-hub>` or just `decisions, <work-hub>`?"
+Ask one focused question with 2-3 concrete options — never open-ended "where should I put this?":
+- "Tag `decisions, <work-hub>` or `brag, <work-hub>`?"
 - "Journal block or its own page?"
-- "Include the code snippet or paraphrase?"
-
-Never ask "where should I put this?" — too open.
-
+- "Keep the snippet or paraphrase?"
