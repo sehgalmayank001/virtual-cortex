@@ -34,6 +34,17 @@ Good (notes voice):
 
 Match the user's tone. Informal in, informal out.
 
+**Sentence rules:**
+- Headline first. The title carries the finding or the number, not the topic: "refund race: low, 4 tokens a photo", not "refund race analysis".
+- One fact per bullet. Two facts → two bullets.
+- Keep the numbers. No "may/could/likely" when the data is there — say the number.
+- Plain nouns: charge, refund, call, user. Not "service", "surface", "path", "signal". No metaphors.
+- Real dates and IDs: "28 Oct", `PROJ-1806`, the commit hash. Never "yesterday", "the ticket", "the fix". (File paths still stay out — see the jargon rule above.)
+- No meta. Nothing about how you found it or what happens next, unless that is the note.
+- Thinking out loud is allowed. A casual note can name a feeling once and end on a real open question — no tidy conclusion forced.
+
+**Personal voice skill:** if the user's skills directory has a `*-voice` skill (e.g. `alex-voice`), read it after this section and apply its word-choice and sentence rules to the note. Skip its message-shape rules — openers, closers, @-mentions, link placement are for posts to other people, not notes to self. The length budget above always holds.
+
 ## Steps
 
 ### 1. Find the takeaway
